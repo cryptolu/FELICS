@@ -1,0 +1,26 @@
+ImplementationDescription: IdentityCipher implementation
+ImplementationAuthors: 
+
+InitializationConstants:
+ProcessAssociatedDataConstants:
+ProcessPlaintextConstants:
+FinalizationConstants:
+TagGenerationConstants:
+ProcessCiphertextConstants:
+
+InitializationCode:
+ProcessAssociatedDataCode:
+ProcessPlaintextCode:
+FinalizationCode:
+TagGenerationCode:
+ProcessCiphertextCode:
+
+UseFinalization: no
+
+ProcessEmptyAssociatedData: no
+ProcessEmptyMessage: no
+
+ImplementationAVR: C
+ImplementationMSP: C
+ImplementationARM: C
+ImplementationPC: C

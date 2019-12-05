@@ -1,0 +1,20 @@
+ImplementationDescription: Lilliput v1 -	Strict implementation of Lilliput specifications with precomputed operations in arrays for key schedule except of MSP and clustering operations on 4 bits
+ImplementationAuthors: Julien Francq and Jean-Baptiste Serrou Soares
+
+EncryptionKeyScheduleConstants: SBOX_constants, CONCAT_constants
+EncryptConstants: SBOX_constants
+DecryptionKeyScheduleConstants:
+DecryptConstants: SBOX_constants
+
+EncryptionKeyScheduleCode:
+EncryptCode:
+DecryptionKeyScheduleCode:
+DecryptCode:
+
+UseEncryptionKeySchedule: yes
+UseDecryptionKeySchedule: no
+
+ImplementationAVR: C
+ImplementationMSP: C
+ImplementationARM: C
+ImplementationPC: C

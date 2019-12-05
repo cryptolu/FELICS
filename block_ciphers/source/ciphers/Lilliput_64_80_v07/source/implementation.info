@@ -1,0 +1,20 @@
+ImplementationDescription: Lilliput v1 -	ASM on the entire embedded platforms, with memory optimization (ROM and RAM). The ARM version presents a serial implementation for the encryption / decryption functions.
+ImplementationAuthors: Julien Francq, Jean-Baptiste Serrou-Soares and Antoine Martinache
+
+EncryptionKeyScheduleConstants: SBOX_constants
+EncryptConstants: SBOX_constants
+DecryptionKeyScheduleConstants: 
+DecryptConstants: SBOX_constants
+
+EncryptionKeyScheduleCode:
+EncryptCode:
+DecryptionKeyScheduleCode:
+DecryptCode:
+
+UseEncryptionKeySchedule: yes
+UseDecryptionKeySchedule: no
+
+ImplementationAVR: ASM
+ImplementationMSP: ASM
+ImplementationARM: ASM
+ImplementationPC: C

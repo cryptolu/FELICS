@@ -1,0 +1,20 @@
+ImplementationDescription: Assembler implementation; unroll 2 rounds
+ImplementationAuthors: Nicky Mouha, Virat Shejwalkar, Daniel Dinu
+
+EncryptionKeyScheduleConstants: 
+EncryptConstants:
+DecryptionKeyScheduleConstants:
+DecryptConstants:
+
+EncryptionKeyScheduleCode:
+EncryptCode: 
+DecryptionKeyScheduleCode:
+DecryptCode:
+
+UseEncryptionKeySchedule: no
+UseDecryptionKeySchedule: no
+
+ImplementationAVR: ASM
+ImplementationMSP: ASM
+ImplementationARM: ASM
+ImplementationPC: C

@@ -1,0 +1,20 @@
+ImplementationDescription: Lilliput v1 with 32-bit operations
+ImplementationAuthors: Julien Francq and Jean-Baptiste Serrou Soares
+
+EncryptionKeyScheduleConstants: SBOX_constants
+EncryptConstants: SBOX_constants
+DecryptionKeyScheduleConstants:
+DecryptConstants: SBOX_constants
+
+EncryptionKeyScheduleCode:
+EncryptCode:
+DecryptionKeyScheduleCode:
+DecryptCode:
+
+UseEncryptionKeySchedule: yes
+UseDecryptionKeySchedule: no
+
+ImplementationAVR: C
+ImplementationMSP: C
+ImplementationARM: C
+ImplementationPC: C

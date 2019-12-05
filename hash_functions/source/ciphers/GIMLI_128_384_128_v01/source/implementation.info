@@ -1,0 +1,18 @@
+ImplementationDescription: This is a reference implementation of GIMLI hash funciton
+ImplementationAuthors: Virat Shejwalkar
+
+InitializationConstants:
+UpdateConstants:
+FinalizationConstants:
+
+InitializationCode:
+UpdateCode: gimli_permute
+FinalizationCode: gimli_permute
+
+UseFinalization: yes
+UseInitialization: no
+
+ImplementationAVR: C
+ImplementationMSP: C
+ImplementationARM: C
+ImplementationPC: C

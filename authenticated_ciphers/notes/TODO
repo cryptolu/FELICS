@@ -1,0 +1,154 @@
+* Things that are not clear yet, but a decission has to be made soon:
+- padding
+
+
+* TODO (09/06/17):
+- add the template cipher (e.g. CipherName_BlockSize_KeySize_NonceSize_StateSize_TagSize_v01) - DONE
+- remove #define MESSAGE_SIZE and ASSOCIATED_DATA_SIZE from constants.h and all other defines that use these ones - DONE
+
+* TODO (10/06/17):
+- Remove printf from core of the cipher implementation - DONE
+- How should the intermediate states/plaintexts/ciphertext be printed/output? - DONE
+
+* TODO (12/06/17):
+- state should be at the beginning of function definition
+- remove unwanted test vectors viz. expectedPostProcessCiphertextState[STATE_SIZE] - DONE
+
+* TODO (15/06/17)
+  Expected completion by Tuesday-(20/06/17)
+- Make a text file where you describe the output (each column) of each script for -m=1. - DONE
+- Added "UseFinalization: yes/no" in implementation.info similar to "UseDecryptionKeySchedule" in block ciphers. - DONE
+- Continue to adapt the scripts in ./scripts/formats/* (depends on T1) - DONE
+- Adapt the scripts in ./scripts/* - DONE
+- Rename variables in scripts to show what they are used for - DONE
+- Check if makes sense to silently exit sim_avr when DEBUG is set to 0. (?)
+- Fix the output tables (?)
+- Make two separate files for TagGeneration() and TagVerification() functions; similarly make changes in RAM usage and code size scripts. - DONE
+
+* TODO (20/06/17)
+- Check if ProcessPlaintext/ ProcessCiphertext functions can use only two arguments viz. (plaintext, state)/(ciphertext, state) instead of 3 arguments.
+- Check which collaboration method suits you: responsible for one whole scenario/ responsible for subset of files in building a scenario
+- Check if its a good idea to merge Finalize() and ProcessTagGeneration()/ProcessTagVerification()
+
+
+********************************************************************************
+List of issues. Choose one and fix it. Mark it as DONE if solved.
+********************************************************************************
+- measure execution time on PC. In ./common/pc/include/cycleCount.h improve the implementation of __cpucycles() to use rdtsc if CPU supports, else use current code. An example here: https://github.com/P-H-C/phc-winner-argon2/blob/d3d81d3002c65e3a1738dd11fdb19bf8ba23349d/src/bench.c#L29 MEDIUM - DONE
+- make state the first parameter in all functions HIGH - DONE
+- we can not use the same macro twice (e.g. BEGIN_ASSOCIATED_DATA_PROCESSING) in ./source/common/main.c because we could have unexpected behavior or wrong result from some tools. To solve use ENCRYPTION/DECRYPTION in the macro names. HIGH - DONE
+- can we use ProcessPlaintext/ProcessCiphertext with in place processing? HIGH - DONE
+- we have two functions: ProcessTagGeneration and ProcessTagVerification, but in implementation.info we have TagVerificationConstants/TagVerificationCode. Is this fine? MEDIUM
+- the following ciphers can not be built: CipherName_BlockSizeInBits_KeySizeInBits_NonceSizeInBits_StateSizeInBits_TagSizeInBits_v01, IdentityCipher_1_128_128_293_128_v01, IdentityCipher_64_128_128_320_128_v01, IdentityCipher_128_128_128_320_128_v01, IdentityCipher_384_128_128_512_128_v01, NORX_384_128_128_512_128_v01, NORX_384_128_128_512_128_v02. Fix build on all platforms. HIGH - DONE
+- ACORN, ASCON and other(?) are blocking on AVR (I used simavr 1.2). HIGH
+    ******* Virat ********* I checked all the ciphers with the changes that are marked DONE in this section and they return "OK!"; I am using simavr=1.5
+- can not extract RAM for ACORN on AVR. HIGH - DONE
+- can not extract execution for ACORN on AVR. HIGH - DONE
+
+********************************************************************************
+List of issues - 22/06/17 by Daniel
+********************************************************************************
+- using ACORN; extract code size; the 7th output (code size for tag_verification.c) in m=1 does not include the code size of "permute.c" as specified in "implementation.info" (PC, AVR, ...) - HIGH - DONE
+- code size for ProcessTagVerification in ACORN is not constant time - LOW - Could you elaborate?
+- ram: Tag Gen is not computed correctly - HIGH - DONE
+- ram: You use various names for the same data in various tables: Process A.D./P.D./C.D. or PAD/PPD/PCD (I saw this in execution time). I lean towards PAD/PPD/PCD. Make it consistent for all names and all displayed tables !!! - MEDIUM - DONE
+- ram: table columns are not aligned (m=0) - MEDIUM - in my case these are aligned; can you please check again.
+- ram: -m=1 displays 9 additional fields not described in mode_1_fields_explanation.txt - HIGH (PC, AVR, ...) - HIGH - DONE
+- cipher_info: update "Block Ciphers Implementation Info" to "Authenticated Ciphers Implementation Info" in info.mwk and info.out - MEDIUM - DONE
+- *_scenario0.out; columns not aligned - LOW - DONE
+- *_scenario0.xml; not correctly formatted => I can not open it with Libre Office - MEDIUM - DONE
+
+
+********************************************************************************
+Files that have to be updated. Just to keep track of them
+********************************************************************************
+- remember to also update the documentation and help information when necessary!
+- ./common/scripts/get_results.sh -- at the very end
+- ./source/architecture/arm.mk -- when a new scenario is added
+- ./common/* -- add here directories for new scenarios (see block_ciphers)
+- ./common/test_cipher.mk -- when a new scenario is added
+- ./common/cipher.mk -- when a new scenario is added
+- ./source/ciphers/CipherName_BlockSizeInBits_KeySizeInBits_NonceSizeInBits_StateSizeInBits_TagSizeInBits_v01/README. Then update all README files using the script
+
+********************************************************************************
+List of issues - 22/06/17 by Virat
+********************************************************************************
+- Try to use rdtscp instead of rdtsc while counting the execution time
+- In case of PC architecture, correct the issue with RAM calculation
+
+********************************************************************************
+Meeting - 26/06/17 
+********************************************************************************
+@Virat: Stack usage for PC - check if this issue is because your gdb version - MED
+@Virat: Introduce some constants in 
+@Virat: Make everything for ARM - HIGH
+@Yann: merge current scripts for PC execution time - CycleCount.h and CycleCountNew.h
+@Virat: Check RAM calculations; remove block_size from it. 
+@Virat: Change TEST_MESSAGE_SIZE from scenario-0 
+@Virat: tg_stack change to ptg_stack
+
+
+Food for thought: 
+- Is it possible to merge Finalize and Tag Generation/Verification functions?
+- Is it possible to incorporate all the scenarios in one main file instead of one per scenario?
+
+********************************************************************************
+Queries - 11/07/17 by Virat
+********************************************************************************
+I connot think of any constraints on the sizes of various inputs in case of AEAD. Please correct me if I am wrong.
+
+
+
+Meeting minutes - 24/07/17
+- Tag verification calls tag generation and then verifies the tag - why does a developer should implement tag verification then?
+    Move tag_verification to /common/ folder and add tag_verification to appropriate parts of make files - DONE
+    Remove tag_verification from implementation.information - DONE
+    Scripts to take care of:
+	    cipher.mk - DONE
+    	check_cipher.sh - DONE
+    	cipher_code_size.sh - DONE
+    	cipher_execution_time.sh - DONE
+    	cipher_ram.sh - DONE
+    *Note: There will be no changes in results/info files as we are still deriving exactly same metrics for TagVerification function.
+
+- Add padding to all the aead source codes and make changes accordingly to the framework; add message_len.
+  - ACORN - Padding functionality is already included in the implementation
+  - ASCON - Padding is implemented now
+  - NORX  - Padding is already implemented; Trying to remove redundancies from the code but will do it when we start optimizing implementations
+  - Checked padding code with a new scenario - 5 added just for testing the padding part of the code.
+- Check how is 2-pass functionality specified NORX, SILK, CLOCK
+
+********************************************************************************
+Queries - 25/07/17 by Virat
+********************************************************************************
+To calculate code size for tag_verification after moving the code part to /common folder, only the ROM of tag_generation.c should be added to tag_verification.c's ROM, right? - DONE
+Should we have a scenario to check correctness of padding in AEAD? - DONE
+
+New tasks 27/07/17
+- Introduce TEST_MESSAGE_SIZE to differentiate between normal testing and padding testing
+- Chnage names to message from ciphertext/plaintextblock
+- Adjust the sizes of columns
+
+********************************************************************************
+Issues and queries 27/07/17
+********************************************************************************
+- Check why is ASCON implementation using stack for -O3 option while other options don't need stack for tag generation - DONE
+- MSP does not build with -co=-O3 (without ALIGNED macro for some test vectors in test_vectors.c) for padding scenario
+
+********************************************************************************
+Meeting 08/08/17
+********************************************************************************
+1. Following macros should be added in main() function if not already defined. They should be set to FALSE by default in main() function. If required these macros should be set to required values by the implementer in constants.h file.
+
+SKIP_STATE_CHECK_INI
+SKIP_STATE_CHECK_PAD
+SKIP_STATE_CHECK_PPD
+SKIP_STATE_CHECK_FIN
+SKIP_STATE_CHECK_TG
+SKIP_STATE_CHECK_PCD
+
+********************************************************************************
+TODOs 23/08/17
+********************************************************************************
+- NORX_v01/02 are not working for MSP/-co=-O1 scenario-0. Correct it.
+- Add test vectors for scenario-0 with data lengths BLOCK_SIZE

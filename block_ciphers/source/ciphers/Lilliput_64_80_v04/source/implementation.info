@@ -1,0 +1,20 @@
+ImplementationDescription: Lilliput v1 -	Key Schedule with strict implementation of Lilliput specifications clustering operations on 4 bits + Encryption/Decryption with easy implementation in C with C language best practices
+ImplementationAuthors: Julien Francq and Jean-Baptiste Serrou Soares
+
+EncryptionKeyScheduleConstants: SBOX_constants
+EncryptConstants: SBOX_constants
+DecryptionKeyScheduleConstants:
+DecryptConstants: SBOX_constants
+
+EncryptionKeyScheduleCode:
+EncryptCode:
+DecryptionKeyScheduleCode:
+DecryptCode:
+
+UseEncryptionKeySchedule: yes
+UseDecryptionKeySchedule: no
+
+ImplementationAVR: C
+ImplementationMSP: C
+ImplementationARM: C
+ImplementationPC: C

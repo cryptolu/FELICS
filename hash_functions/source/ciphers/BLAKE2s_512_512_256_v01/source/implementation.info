@@ -1,0 +1,18 @@
+ImplementationDescription: This is a reference implemetation of BLAKE2s
+ImplementationAuthors: Jean-Philippe Aumasson, Virat Shejwalkar
+
+InitializationConstants: blake2s_IV
+UpdateConstants: blake2s_IV
+FinalizationConstants:
+
+InitializationCode:
+UpdateCode: blake2s_round
+FinalizationCode:
+
+UseFinalization: yes
+UseInitialization: yes
+
+ImplementationAVR: C
+ImplementationMSP: C
+ImplementationARM: C
+ImplementationPC: C

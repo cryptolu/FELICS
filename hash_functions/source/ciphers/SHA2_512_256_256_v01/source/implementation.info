@@ -1,0 +1,18 @@
+ImplementationDescription: SHA256 implementation
+ImplementationAuthors: Yann Le Corre
+
+InitializationConstants:
+UpdateConstants: constants.o
+FinalizationConstants: constants.o
+
+InitializationCode:
+UpdateCode: process_chunk.o
+FinalizationCode: process_chunk.o
+
+UseFinalization: yes
+UseInitialization: yes
+
+ImplementationAVR: C
+ImplementationMSP: C
+ImplementationARM: C
+ImplementationPC: C

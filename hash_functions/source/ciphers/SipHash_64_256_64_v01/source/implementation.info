@@ -1,0 +1,18 @@
+ImplementationDescription: This is a reference implementation of SipHash-2-4
+ImplementationAuthors: Virat Shejwalkar
+
+InitializationConstants: Siphash_Key
+UpdateConstants:
+FinalizationConstants:
+
+InitializationCode:
+UpdateCode:
+FinalizationCode:
+
+UseFinalization: yes
+UseInitialization: yes
+
+ImplementationAVR: C
+ImplementationMSP: C
+ImplementationARM: C
+ImplementationPC: C

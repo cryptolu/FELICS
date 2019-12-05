@@ -1,0 +1,26 @@
+ImplementationDescription: Cipher implementation example
+ImplementationAuthors: 
+
+InitializationConstants: constants
+ProcessAssociatedDataConstants:
+ProcessPlaintextConstants:
+FinalizationConstants:
+TagGenerationConstants:
+ProcessCiphertextConstants: constants
+
+InitializationCode:
+ProcessAssociatedDataCode:
+ProcessPlaintextCode:
+FinalizationCode:
+TagGenerationCode:
+ProcessCiphertextCode:
+
+UseFinalization: no
+
+ProcessEmptyAssociatedData: no
+ProcessEmptyMessage: no
+
+ImplementationAVR: C
+ImplementationMSP: C
+ImplementationARM: C
+ImplementationPC: C

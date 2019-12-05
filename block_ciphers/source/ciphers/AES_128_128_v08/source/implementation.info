@@ -1,0 +1,20 @@
+ImplementationDescription: AVRAES RijndaelFast: a fast implementation of AES for AVR
+ImplementationAuthors: B. Poettering point-at-infinity.org/avraes/
+
+EncryptionKeyScheduleConstants: constants
+EncryptConstants: constants
+DecryptionKeyScheduleConstants: constants
+DecryptConstants: constants
+
+EncryptionKeyScheduleCode:
+EncryptCode:
+DecryptionKeyScheduleCode:
+DecryptCode:
+
+UseEncryptionKeySchedule: yes
+UseDecryptionKeySchedule: yes
+
+ImplementationAVR: ASM
+ImplementationMSP:
+ImplementationARM:
+ImplementationPC:

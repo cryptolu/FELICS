@@ -1,0 +1,83 @@
+
+1.  ADBLOCK_NUM and PTBLOCK_NUM are required in constants.h file because they will probably
+    be used in scenarios other than the scenario-0.
+
+2.  TEST_MESSAGE_SIZE should be used as discussed
+        1. For S0, TEST_MESSAGE_SIZE will be same as BLOCK_SIZE
+        2. For Sx, TEST_MESSAGE_SIZE will depend on how much data needs to be en/decrypted
+
+3.  For the ciphers that en/de bit wise, such as ACORN, AES-OTR, block size should be 
+    implementation dependent
+
+4.  Following are the stages of cipher implementation and it's testing:
+      We have to print state after each of these states and hence in test_vectors.c file
+      there should be expected state value for each of the following stages:
+     *Encryption:
+        initializeState() - expectedState[]
+        initialization
+            print state here - expectedPostInitializationState[]
+        process associated data
+            print state here - expectedPostAssociatedDataProcessingState[]
+        process plaintext data
+            print state here (?)
+            print ciphertext here - expectedCiphertext[]
+        tag generation
+            print tag here
+        finalization
+            print state here
+
+     *Decryption:
+        initialization
+            print state here
+        process associated data
+            print state here
+        process ciphertext data
+            print state here
+        tag generation and verification
+            print tag
+        finalization
+            print verification result if tag doesn't match
+            print plaintext if tag matches
+
+5.  Types of test vectors: Following types can be combined for plaintext, nonce, key
+        {0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff}
+        {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
+        {0x01,0x23,0x45,0x67,0x89,0xab,0xcd,0xef}
+        {0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, ..., 0xff}
+        {0x82,0xb4,0x10,0x9f,0xcc,0x70,0xbd,0x1f}
+        random string - {0x53, 0xa1, 0xbd, 0x35, 0x7d, 0x89, 0x64, 0x22}
+        {0xff, 0xee, 0xdd, 0xcc, 0xbb, 0xaa, 0x99, 0x88, 0x77, 0x66, 0x55, 0x44, 0x33, 0x22, 0x11, 0x00}
+        {0xef, 0xcd, 0x0ab, 0x89, 0x67, 0x45, 0x23, 0x01}
+        key = plaintext
+        sequence of key = opposite sequence of plaintext/nonce
+
+6.  Naming the folders should be as given by the authors: Except Deoxys and Tiaoxin, all the CAESAR candidates
+    are in all CAPS
+
+7.  Order of constants in constants.h files should be:
+        block_size
+        key_size
+        nonce_size
+        state_size
+        tag_size
+
+8.  Padding of plaintext/ciphertext and/or associated data text should be done inside process_plaintext/ciphertext.c
+    and process_associated_data.c files. I don't think there is a need for new file just for padding
+
+ 9. DEBUG_LOW: pt, ct, tag
+    DEBUG_MED: *, key, nonce, ad
+    DEBUG_HIGH: *, state
+
+10. While counting execution times for different parts of cipher in AVR architecture, the time required for 
+    corresponding BEGIN_* and END_* functions is also counted. This should not be a concern as these times 
+    will be constant across ciphers and for relative comparison the overheads can be ignored
+
+11. Order of metrics measurements in script_mode = 1 should correspond to the following functions' order:
+    initialize, pad, ppd, finalize, ptg, pcd, ptv
+
+12. Scenarios and specs:
+    Scenario0 - PT, AD - {block size, block size}
+    Scenario1 - PT, AD - {128 bytes, 16 bytes}
+    Scenario2 - PT, AD - {128 bytes, 0 bytes}
+
+

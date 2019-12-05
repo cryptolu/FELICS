@@ -1,0 +1,26 @@
+ImplementationDescription: "16-bit Fast Grain128-AEAD" implementation (target=MSP)
+ImplementationAuthors: Alexander Maximov
+
+InitializationConstants:
+ProcessAssociatedDataConstants:
+ProcessPlaintextConstants:
+FinalizationConstants:
+TagGenerationConstants:
+ProcessCiphertextConstants:
+
+InitializationCode: grain_update
+ProcessAssociatedDataCode: grain_update, grain_getz, grain_auth
+ProcessPlaintextCode: grain_encdec, grain_update, grain_getz, grain_auth
+FinalizationCode:
+TagGenerationCode:
+ProcessCiphertextCode: grain_encdec, grain_update, grain_getz, grain_auth
+
+UseFinalization: no
+
+ProcessEmptyAssociatedData: yes
+ProcessEmptyMessage: yes
+
+ImplementationAVR: no
+ImplementationMSP: C+ASM
+ImplementationARM: no
+ImplementationPC: no

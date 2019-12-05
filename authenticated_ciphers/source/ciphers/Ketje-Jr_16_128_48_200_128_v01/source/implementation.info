@@ -1,0 +1,26 @@
+ImplementationDescription: This is Ketje-Jr AEAD implementation with key,nonce:12,10 bytes
+ImplementationAuthors: Guido Bertoni, Virat Shejwalkar, 3D
+
+InitializationConstants: KetJr_StateTwistIndexes, KeccakRhoOffsets, KeccakRoundConstants
+ProcessAssociatedDataConstants: KetJr_StateTwistIndexes, KeccakRhoOffsets, KeccakRoundConstants
+ProcessPlaintextConstants: KetJr_StateTwistIndexes, KeccakRhoOffsets, KeccakRoundConstants
+FinalizationConstants:
+TagGenerationConstants: KetJr_StateTwistIndexes, KeccakRhoOffsets, KeccakRoundConstants
+ProcessCiphertextConstants: KetJr_StateTwistIndexes, KeccakRhoOffsets, KeccakRoundConstants
+
+InitializationCode: ketje_state_add_byte, ketje_state_overwrite, keccak_round, keccak_add_byte
+ProcessAssociatedDataCode: keccak_add_byte, keccak_add_bytes, ketje_state_add_byte, ketje_step, keccak_round
+ProcessPlaintextCode: keccak_add_byte, keccak_add_bytes, keccak_extract_bytes, ketje_state_add_byte, ketje_state_extract_byte, keccak_round
+FinalizationCode:
+TagGenerationCode: ketje_state_extract_byte, ketje_step, keccak_extract_bytes, keccak_round
+ProcessCiphertextCode: kecak_add_byte, keccak_add_bytes, keccak_extract_and_add_bytes, keccak_round, ketje_state_add_byte, ketje_state_extract_byte, keccak_extract_bytes
+
+UseFinalization: no
+
+ProcessEmptyAssociatedData: yes
+ProcessEmptyMessage: yes
+
+ImplementationAVR: C
+ImplementationMSP: C
+ImplementationARM: C
+ImplementationPC: C

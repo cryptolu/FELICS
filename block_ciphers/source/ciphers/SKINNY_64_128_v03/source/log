@@ -1,0 +1,34 @@
+make -f ./../../../common/cipher.mk COMPILER_OPTIONS='-O3' ARCHITECTURE=ARM SCENARIO=1
+make[1]: Entering directory '/home/zak/Desktop/FELICS/block_ciphers/source/ciphers/SKINNY_64_128_v02/source'
+Building for ARM ...
+Building with DEBUG flag NOT set ...
+Building with SCENARIO flag set to 1 ...
+Building with MEASURE_CYCLE_COUNT flag NOT set ...
+Building with COMPILER_OPTIONS flag set to -O3 ...
+---------- Start building SKINNY_64_128_v02 ----------
+arm-none-eabi-gcc -c -mcpu=cortex-m3 -D__SAM3X8E__ -march=armv7-m -mthumb -g -fdata-sections -ffunction-sections -fstack-usage -Wcast-align -Wsign-compare -Waggregate-return -Wunused -Wfatal-errors -Wa,-mimplicit-it=thumb -Wa,-EL -fno-exceptions -I../../../../../common/source/arm/include -D ARM -D SCENARIO=1 -O3 constants.c -I./../source -I./../../../common -I./../../../../../common/source/rotations -o ./../build/constants.o
+arm-none-eabi-gcc -c -mcpu=cortex-m3 -D__SAM3X8E__ -march=armv7-m -mthumb -g -fdata-sections -ffunction-sections -fstack-usage -Wcast-align -Wsign-compare -Waggregate-return -Wunused -Wfatal-errors -Wa,-mimplicit-it=thumb -Wa,-EL -fno-exceptions -I../../../../../common/source/arm/include -D ARM -D SCENARIO=1 -O3 test_vectors.c -I./../source -I./../../../common -I./../../../../../common/source/rotations -o ./../build/test_vectors.o
+arm-none-eabi-gcc -c -mcpu=cortex-m3 -D__SAM3X8E__ -march=armv7-m -mthumb -g -fdata-sections -ffunction-sections -fstack-usage -Wcast-align -Wsign-compare -Waggregate-return -Wunused -Wfatal-errors -Wa,-mimplicit-it=thumb -Wa,-EL -fno-exceptions -I../../../../../common/source/arm/include -D ARM -D SCENARIO=1 -O3 encrypt.c -I./../source -I./../../../common -I./../../../../../common/source/rotations -o ./../build/encrypt.o
+arm-none-eabi-gcc -c -mcpu=cortex-m3 -D__SAM3X8E__ -march=armv7-m -mthumb -g -fdata-sections -ffunction-sections -fstack-usage -Wcast-align -Wsign-compare -Waggregate-return -Wunused -Wfatal-errors -Wa,-mimplicit-it=thumb -Wa,-EL -fno-exceptions -I../../../../../common/source/arm/include -D ARM -D SCENARIO=1 -O3 decryption_key_schedule.c -I./../source -I./../../../common -I./../../../../../common/source/rotations -o ./../build/decryption_key_schedule.o
+arm-none-eabi-gcc -c -mcpu=cortex-m3 -D__SAM3X8E__ -march=armv7-m -mthumb -g -fdata-sections -ffunction-sections -fstack-usage -Wcast-align -Wsign-compare -Waggregate-return -Wunused -Wfatal-errors -Wa,-mimplicit-it=thumb -Wa,-EL -fno-exceptions -I../../../../../common/source/arm/include -D ARM -D SCENARIO=1 -O3 encryption_key_schedule.c -I./../source -I./../../../common -I./../../../../../common/source/rotations -o ./../build/encryption_key_schedule.o
+arm-none-eabi-gcc -c -mcpu=cortex-m3 -D__SAM3X8E__ -march=armv7-m -mthumb -g -fdata-sections -ffunction-sections -fstack-usage -Wcast-align -Wsign-compare -Waggregate-return -Wunused -Wfatal-errors -Wa,-mimplicit-it=thumb -Wa,-EL -fno-exceptions -I../../../../../common/source/arm/include -D ARM -D SCENARIO=1 -O3 decrypt.c -I./../source -I./../../../common -I./../../../../../common/source/rotations -o ./../build/decrypt.o
+arm-none-eabi-gcc -c -mcpu=cortex-m3 -D__SAM3X8E__ -march=armv7-m -mthumb -g -fdata-sections -ffunction-sections -fstack-usage -Wcast-align -Wsign-compare -Waggregate-return -Wunused -Wfatal-errors -Wa,-mimplicit-it=thumb -Wa,-EL -fno-exceptions -I../../../../../common/source/arm/include -D ARM -D SCENARIO=1 -O3 ../../../common/scenario1/scenario1.c -I./../source -I./../../../common -I./../../../../../common/source/rotations -o ./../build/scenario1.o
+arm-none-eabi-gcc -c -mcpu=cortex-m3 -D__SAM3X8E__ -march=armv7-m -mthumb -g -fdata-sections -ffunction-sections -fstack-usage -Wcast-align -Wsign-compare -Waggregate-return -Wunused -Wfatal-errors -Wa,-mimplicit-it=thumb -Wa,-EL -fno-exceptions -I../../../../../common/source/arm/include -D ARM -D SCENARIO=1 -O3 ../../../common/scenario1/encrypt_scenario1.c -I./../source -I./../../../common -I./../../../../../common/source/rotations -o ./../build/encrypt_scenario1.o
+arm-none-eabi-gcc -c -mcpu=cortex-m3 -D__SAM3X8E__ -march=armv7-m -mthumb -g -fdata-sections -ffunction-sections -fstack-usage -Wcast-align -Wsign-compare -Waggregate-return -Wunused -Wfatal-errors -Wa,-mimplicit-it=thumb -Wa,-EL -fno-exceptions -I../../../../../common/source/arm/include -D ARM -D SCENARIO=1 -O3 ../../../common/scenario1/decrypt_scenario1.c -I./../source -I./../../../common -I./../../../../../common/source/rotations -o ./../build/decrypt_scenario1.o
+arm-none-eabi-gcc -c -mcpu=cortex-m3 -D__SAM3X8E__ -march=armv7-m -mthumb -g -fdata-sections -ffunction-sections -fstack-usage -Wcast-align -Wsign-compare -Waggregate-return -Wunused -Wfatal-errors -Wa,-mimplicit-it=thumb -Wa,-EL -fno-exceptions -I../../../../../common/source/arm/include -D ARM -D SCENARIO=1 -O3 ../../../common/common.c -I./../source -I./../../../common -I./../../../../../common/source/rotations -o ./../build/common.o
+arm-none-eabi-gcc -mcpu=cortex-m3 -march=armv7-m -mthumb -T../../../../../common/source/arm/flash.ld -L../../../../../common/source/arm -Wl,--gc-sections -Wl,--relax -Wl,--entry=Reset_Handler ./../build/constants.o ./../build/test_vectors.o ./../build/encrypt.o ./../build/decryption_key_schedule.o ./../build/encryption_key_schedule.o ./../build/decrypt.o \
+	./../build/scenario1.o \
+	./../build/encrypt_scenario1.o \
+	./../build/decrypt_scenario1.o \
+	./../build/common.o -lsam3x -o ./../build/scenario1.elf
+arm-none-eabi-objdump -dSt ./../build/scenario1.elf > ./../build/scenario1.lst
+arm-none-eabi-objdump -dSt ./../build/constants.o > ./../build/constants.lst
+arm-none-eabi-objdump -dSt ./../build/test_vectors.o > ./../build/test_vectors.lst
+arm-none-eabi-objdump -dSt ./../build/encrypt.o > ./../build/encrypt.lst
+arm-none-eabi-objdump -dSt ./../build/decryption_key_schedule.o > ./../build/decryption_key_schedule.lst
+arm-none-eabi-objdump -dSt ./../build/encryption_key_schedule.o > ./../build/encryption_key_schedule.lst
+arm-none-eabi-objdump -dSt ./../build/decrypt.o > ./../build/decrypt.lst
+arm-none-eabi-objdump -dSt ./../build/encrypt_scenario1.o > ./../build/encrypt_scenario1.lst
+arm-none-eabi-objdump -dSt ./../build/decrypt_scenario1.o > ./../build/decrypt_scenario1.lst
+---------- End building SKINNY_64_128_v02 ----------
+make[1]: Leaving directory '/home/zak/Desktop/FELICS/block_ciphers/source/ciphers/SKINNY_64_128_v02/source'

@@ -1,0 +1,36 @@
+Benchmarking platforms -
+
+Framework         | Amount of data hashed                                      | Reference
+eBASH             | 0b - 4096b; featured sizes - {8, 64, 576, 1536, 4096}b     | < http://bench.cr.yp.to/results-hash.html >
+XBX               | 0b - 4096b; featured sizes - {8, 64, 576, 1536, 4096}b     | < http://bench.cr.yp.to/results-hash.html >
+ECRYPT 2          | 8, 50, 100, 500 bytes                                      | < https://eprint.iacr.org/2012/507.pdf >
+ATHENA            | 0b - 128b                                                  | < http://ece.gmu.edu/~kgaj/publications/conferences/GMU_CHES_2010.pdf >
+
+Lightweight IoT Comm Protocols -
+
+Protocol          | Security protocol       | Msg Size      | payload size     | Reference
+MQTT              | TCP                     | 2b - 2^{17}b  | < 2^{17}b        | < https://console.bluemix.net/docs/services/IoT/reference/mqtt/index.html >
+CoAP              | DTLS                    | < 1152b       | < 1024b          | < https://tools.ietf.org/html/rfc7252#section-4.6 >
+
+Cryptocurrencies and hash functions -
+
+- Merkle tree/hash tree construction is used and final hash is the root hash of all the hashes of all the transactions involved
+- Avg number of transactions/block - 1400  < https://blockchain.info/charts/n-transactions-per-block?daysAverageString=7&timespan=2years >
+- Avg size of a transaction: 512 bytes     < https://blockchain.info/charts/avg-block-size?timespan=2years&daysAverageString=7 >
+
+
+
+Scenario     Msg len/s to                            Purpose
+             be hashed (bytes)
+
+0 -          BLOCK_SIZE -                            Implementation testing
+
+1 -          8,128,2048,4096 -                       Measure performance for short to long msg*
+
+2 -          128 -                                   HMAC with 128/256-bit key
+
+3 -          1536 blocks of 512 bytes                Merkle tree
+
+*Note: XBX/eBASH use performance for 2048 and 4096 byte messages to calculate performance (cycles/byte) of long messages.
+
+

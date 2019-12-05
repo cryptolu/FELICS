@@ -1,0 +1,2 @@
+This folder holds the original todo and annotatios from the previous programmer. Shouldn't be added to any public distribution of the framework. On the other hand, this folder will not be git-ignored since there can be usefull information to the current programmer responsible for the project, AKA me.
+The current markdown TODO is not to be stored in this folder.

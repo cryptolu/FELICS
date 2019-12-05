@@ -1,0 +1,73 @@
+/*
+   Copyright : 2019 (C) Design team of Grain128-AEAD
+   License   : We grant a free license to use and modify the code by anyone and in any way, for any purpose
+   Cipher    : Grain128-AEAD for FELICS-AEAD framework
+   Target    : 8-bit AVR ATMega 128, Fast speed code (C+ASM)
+   Author    : Alexander Maximov
+   Date      : 2019-11-25
+ */
+
+#include "grain_common.h"
+#include "constants.h"
+
+static inline uint8_t SWAP(uint8_t x)
+{	return (x>>4)|(x<<4);	/* this compiles into a single AVR instruction (swap rd) */
+}
+
+
+uint8_t grain_update(GrainState * g)
+{	
+	union _word16
+	{	uint16_t w;
+		struct
+		{	uint8_t a;
+			uint8_t b;
+		} s;
+	} u;
+
+	// At most 18 registers to be used, but I think less
+	uint8_t y, ln, nn, t0, t1, t2;
+
+#define UL(i) (*(union _word16*)(g->lfsr + i)).w
+#define UN(i) (*(union _word16*)(g->nfsr + i)).w
+#define SWAP4(hi, lo) SWAP(((hi)&0x0f)^((lo)&0xf0))
+
+	ln = nn = g->lfsr[0];
+	ln ^= g->lfsr[12];
+	u.w = (((UL(4) ^ UL(8)) << 1) ^ UL(0)) << 1; ln ^= u.s.b;
+	ln ^= (uint8_t)(UL(10)>>1);
+	u.w = UL(11)<<2; t1 = u.s.b;
+	u.w <<= 1; y = u.s.b;
+	u.w = (UL(1)>>1) & UL(2); y ^= SWAP4(u.s.b, u.s.a);
+	t0 = (uint8_t)(UL(5) >> 2);
+	u.w = UL(9)<<1; y^= u.s.b & SWAP4(g->lfsr[8], g->lfsr[7]);
+	nn ^= g->nfsr[12];
+	t2 = SWAP4(g->nfsr[2], g->nfsr[1]);
+	t1 = t0 ^ (t2 & t1);
+	y ^= t2 & g->lfsr[1];
+
+#define CP(v)	v[0]=v[1], v[1]=v[2], v[2]=v[3], v[3]=v[4], v[4]=v[5], v[5]=v[6], v[6]=v[7], v[7]=v[8],\
+				v[8]=v[9], v[9]=v[10], v[10]=v[11], v[11]=v[12], v[12]=v[13], v[13]=v[14], v[14]=v[15]
+
+	CP(g->lfsr);
+	g->lfsr[15] = ln;
+
+	// --- only NF remained ---
+	u.w = UN(11)<<1; t0 = u.s.b;
+	y ^= t1 &= t0;
+	u.w = (UN(11)>>1) & UN(11); nn^= (SWAP4(u.s.b, u.s.a) & g->nfsr[11] & t0) ^ g->nfsr[0] ^ g->nfsr[7];
+	y ^= g->nfsr[8];
+	nn ^= (uint8_t)((((((((UN(8) & UN(10)) >> 1) ^ ((UN(1)>>2) & UN(1)) ^ UN(11) ^ (UN(0) & UN(8)) ^ (UN(3) & UN(7))) >> 1) ^ UN(3))>>1)
+		^ (UN(2) & (UN(2)>>1)))>>1) ^ (g->nfsr[5] & g->nfsr[6]);
+	y ^= (uint8_t)(((UN(0)>>1) ^ UN(9) ^ UN(11))>>1);
+	u.w = UN(1)<<1; y^=u.s.b;
+	u.w = (UN(5)>>1) ^ UN(4); y^=SWAP4(u.s.b, u.s.a);
+	u.w = UN(2)<<2; nn ^= u.s.b & g->nfsr[3] & (uint8_t)(UN(3)>>1);
+	u.w = UN(7)>>1; nn^=SWAP4(u.s.b, u.s.a) & (uint8_t)(UN(8)>>1);
+	u.w = (UN(8) & UN(9))<<2; nn ^= u.s.b & (uint8_t)(UN(10)>>2);
+
+	CP(g->nfsr);
+	g->nfsr[15] = nn;
+	return y;
+}
+

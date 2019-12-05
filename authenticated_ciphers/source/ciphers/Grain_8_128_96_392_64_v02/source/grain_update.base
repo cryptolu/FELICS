@@ -1,0 +1,40 @@
+
+	uint8_t ln, nn, y, i;
+
+#define LF(i) (*(uint16_t*)((uint8_t*)g->lfsr + i))
+#define NF(i) (*(uint16_t*)((uint8_t*)g->nfsr + i))
+
+	ln = (((((LF(0)>>1) ^ LF(4) ^ LF(8))>>5) ^ LF(10))>>1) ^ g->lfsr[0] ^ g->lfsr[12];
+	
+	uint16_t nf11 = NF(11)>>1;
+	uint16_t t1 = NF(1)>>2;
+	uint16_t t0 =
+		 (((t1 ^ LF(11) ^ NF(5))>>1)
+		^ NF(4) ^ ((LF(1)>>1) & LF(2)) ^ (LF(7) & (LF(9)>>3))
+		^ NF(1) & ((nf11 & LF(11))>>2));
+
+	y = nf11;
+	nf11 >>= 1;
+	nn = ((((nf11 & NF(11))>>1) & NF(11))>>4) & NF(11);
+	nf11 >>= 1;
+	nn ^= nf11;
+	y ^= (((((t0>>2) ^ (nf11>>2) & LF(5)) ^ NF(0))>>1) ^ NF(9))>>1;
+	y ^= g->nfsr[8];
+	y ^= (t1>>2) & LF(1);
+
+	nn ^= g->lfsr[0] ^ g->nfsr[0] ^ g->nfsr[12] ^ (g->nfsr[6] & (uint16_t)NF(5)) ^ (uint16_t)NF(7);
+
+	nn ^= (NF(3)>>2);
+
+	t0 = NF(2)>>1;
+	nn ^= (((t0>>4) & NF(3))>>1) & NF(3);
+
+	nn ^= (((((((NF(8) & NF(10))>>1) ^ (NF(0) & NF(8)) 
+		^ (t1 & NF(1)) ^ (NF(3) & NF(7)))>>1)
+		^ (((NF(8) & NF(9)) >> 4) & NF(10))) >> 1)
+		^ ((NF(7)>>4) & NF(8)) ^ (NF(2) & t0)) >> 1;
+
+	memcpy(g->lfsr, g->lfsr + 1, 31);
+	g->lfsr[15] = ln;
+	g->nfsr[15] = nn;
+	return y;

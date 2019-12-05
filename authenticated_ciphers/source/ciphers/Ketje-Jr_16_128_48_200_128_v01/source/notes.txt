@@ -1,0 +1,88 @@
+Code
+====
+
+KECCAK functions
+----------------
+KeccakP200_AddByte (keccak_add_byte) is called by:
+    ketje_step.c
+    ketje_state_add_byte.c
+    PPD
+    PCD
+KeccakP200_AddBytes (keccak_add_bytes) is called by:
+    PAD
+    PPD
+    PCD
+KeccakP200_ExtractAndAddBytes (keccak_extract_and_add_bytes) is called by:
+    PCD
+KeccakP200_ExtractBytes (keccak_extract_bytes) is called by:
+    ketje_state_extract_byte.c
+    PPD
+KeccakP200_Permute_Nrounds (keccak_round) is called by:
+    ketje_step
+    I
+    PPD
+    PCD
+
+
+KETJE functions
+---------------
+KetJr_StateAddByte (ketje_state_add_byte) is called by:
+    I
+    PAD
+    PPD
+    PCD
+KetJr_StateExtractByte (ketje_state_extract_byte) is called by:
+    TG
+    PPD
+    PCD
+KetJr_StateOverwrite (ketje_state_overwrite) is called by:
+    I
+KetJr_Step (ketje_step) is called by:
+    TG
+    PAD
+
+
+Result
+------
+I:
+    kecak_round
+    ketje_state_add_byte ->+ keccak_add_byte
+    ketje_state_overwrite
+PAD:
+    keccak_add_bytes
+    ketje_state_add_byte ->+ keccak_add_byte
+    ketje_step ->+ keccak_round
+PPD:
+    keccak_add_byte
+    keccak_add_bytes
+    keccak_extract_bytes
+    keccak_round
+    ketje_state_add_byte
+    ketje_state_extract_byte
+PCD:
+    keccak_add_byte
+    keccak_add_bytes
+    keccak_extract_and_add_bytes
+    keccak_round
+    ketje_state_add_byte
+    ketje_state_extract_byte ->+ keccak_extract_bytes
+TG:
+    ketje_state_extract_byte  ->+ keccak_extract_bytes
+    ketje_step -> + keccak_add_byte -> keccak_round
+
+
+
+Constants
+---------
+KeccakRoundConstants
+    keccak_round
+KeccakRhoOffsets
+    keccak_round
+KetJr_StateTwistIndexes
+    ketje_step
+    ketje_state_extract_byte
+    ketje_state_add_byte
+    PAD
+    ketje_state_overwrite
+    PPD
+    PCD

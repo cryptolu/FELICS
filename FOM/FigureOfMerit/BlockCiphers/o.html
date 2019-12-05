@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>BlockCiphers</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+</head>
+<body>
+<p><span style="color: red"><strong>Note:</strong> </span></p>
+<ul>
+<li>Block and key sizes are expressed in bits [b].</li>
+<li>Code size (Code) and RAM consumption (RAM) are expressed in bytes [B].</li>
+<li>Execution time (Time) is expressed in cycles [cyc.].</li>
+<li>Security level (Sec.) is the ratio of the number of rounds broken in a single key setting to the total number of rounds.</li>
+<li>For ciphers against which there is no attack (to the best of our knowledge) the security level is set to -1.</li>
+<li>Details about cryptographic properties of each cipher are available <a href="Lightweight_Block_Ciphers#Summary" title="wikilink">here</a>.</li>
+<li>Results for assembly implementations are displayed in <em>italic</em>.</li>
+<li><em>Cipher-r</em> denotes the cipher <em>Cipher</em> with <em>r</em> rounds instead of the default number of rounds.</li>
+</ul>
+<title>
+<p>Block Ciphers</p>
+</title>
+<h1 id="scenario-1">Scenario 1</h1>
+<p>A description of scenario 1 can be found <a href="FELICS_Block_Ciphers#Scenario_1_-_Communication_Protocol" title="wikilink">here</a>.</p>
+<table>
+<caption>Results for scenario 1 - I: Encryption + Decryption (including key schedule). Encrypt 128 bytes of data using CBC mode. For each cipher, an optimal implementation on each architecture is selected.</caption>
+<thead>
+<tr class="header">
+<th><p>Cipher Info</p></th>
+<th><p>Results</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>AVR</p></td>
+<td><p>MSP</p></td>
+</tr>
+<tr class="even">
+<td><p>Cipher</p></td>
+<td><p>Block [b]</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Chaskey</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Chaskey-LTS</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Speck</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Speck</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Simon</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Simon</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">RECTANGLE</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">RECTANGLE</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">LEA</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">SPARX</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">SPARX</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">HIGHT</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">SKINNY</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">AES</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">SKINNY</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Fantomas</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Robin</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Lilliput</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#" title="wikilink">Robin*</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">RoadRunneR</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">RC5-20</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">RoadRunneR</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">PRIDE</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">LBlock</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">PRESENT</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">PRINCE</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">TWINE</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Piccolo</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">LED</a></p></td>
+<td><p>64</p></td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption>Results for scenario 1 - II: Encryption (without key schedule). Encrypt 128 bytes of data using CBC mode. For each cipher, an optimal implementation on each architecture is selected.</caption>
+<thead>
+<tr class="header">
+<th><p>Cipher Info</p></th>
+<th><p>Results</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>AVR</p></td>
+<td><p>MSP</p></td>
+</tr>
+<tr class="even">
+<td><p>Cipher</p></td>
+<td><p>Block [b]</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Chaskey</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Chaskey-LTS</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Speck</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Speck</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Simon</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Simon</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">RECTANGLE</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">RECTANGLE</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">LEA</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">SPARX</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">SPARX</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">HIGHT</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">SKINNY</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">AES</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">SKINNY</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Fantomas</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Robin</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Lilliput</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#" title="wikilink">Robin*</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">RoadRunneR</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">RC5-20</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">RoadRunneR</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">PRIDE</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">LBlock</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">PRESENT</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">PRINCE</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">TWINE</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Piccolo</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">LED</a></p></td>
+<td><p>64</p></td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption>Results for scenario 1 - III: Decryption (without key schedule). Encrypt 128 bytes of data using CBC mode. For each cipher, an optimal implementation on each architecture is selected.</caption>
+<thead>
+<tr class="header">
+<th><p>Cipher Info</p></th>
+<th><p>Results</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>AVR</p></td>
+<td><p>MSP</p></td>
+</tr>
+<tr class="even">
+<td><p>Cipher</p></td>
+<td><p>Block [b]</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Chaskey</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Chaskey-LTS</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Speck</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Speck</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Simon</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Simon</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">RECTANGLE</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">RECTANGLE</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">LEA</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">SPARX</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">SPARX</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">HIGHT</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">SKINNY</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">AES</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">SKINNY</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Fantomas</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Robin</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Lilliput</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#" title="wikilink">Robin*</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">RoadRunneR</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">RC5-20</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">RoadRunneR</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">PRIDE</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">LBlock</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">PRESENT</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">PRINCE</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">TWINE</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Piccolo</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">LED</a></p></td>
+<td><p>64</p></td>
+</tr>
+</tbody>
+</table>
+<h1 id="scenario-2">Scenario 2</h1>
+<p>A description of scenario 2 can be found <a href="FELICS_Block_Ciphers#Scenario_2_-_Challenge-Handshake_Authentication_Protocol" title="wikilink">here</a>.</p>
+<table>
+<caption>Results for scenario 2 - I: Balanced (globally efficient). Encrypt 128 bits of data using CTR mode. For each cipher, an optimal implementation on each architecture is selected.</caption>
+<thead>
+<tr class="header">
+<th><p>Cipher Info</p></th>
+<th><p>Results</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>AVR</p></td>
+<td><p>MSP</p></td>
+</tr>
+<tr class="even">
+<td><p>Cipher</p></td>
+<td><p>Block [b]</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Chaskey</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Chaskey-LTS</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Speck</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Speck</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Simon</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Simon</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">LEA</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">SPARX</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">RECTANGLE</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">RECTANGLE</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">SPARX</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">AES</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">RC5-20</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">HIGHT</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">SKINNY</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">SKINNY</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Lilliput</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Fantomas</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Robin</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#" title="wikilink">Robin*</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">RoadRunneR</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">RoadRunneR</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">PRIDE</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">LBlock</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">PRESENT</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">TWINE</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">PRINCE</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Piccolo</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">LED</a></p></td>
+<td><p>64</p></td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption>Results for scenario 2 - II: Small code size &amp; RAM. Encrypt 128 bits of data using CTR mode. For each cipher, an optimal implementation on each architecture is selected.</caption>
+<thead>
+<tr class="header">
+<th><p>Cipher Info</p></th>
+<th><p>Results</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>AVR</p></td>
+<td><p>MSP</p></td>
+</tr>
+<tr class="even">
+<td><p>Cipher</p></td>
+<td><p>Block [b]</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">AES</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Chaskey</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Chaskey-LTS</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Fantomas</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">HIGHT</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">LBlock</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">LEA</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">LED</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Lilliput</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Piccolo</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">PRESENT</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">PRIDE</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">PRINCE</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">RC5-20</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">RECTANGLE</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">RECTANGLE</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">RoadRunneR</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">RoadRunneR</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Robin</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#" title="wikilink">Robin*</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Simon</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Simon</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">SKINNY</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">SKINNY</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">SPARX</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">SPARX</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Speck</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Speck</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">TWINE</a></p></td>
+<td><p>64</p></td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption>Results for scenario 2 - III: Best execution time. Encrypt 128 bits of data using CTR mode. For each cipher, an optimal implementation on each architecture is selected.</caption>
+<thead>
+<tr class="header">
+<th><p>Cipher Info</p></th>
+<th><p>Results</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>AVR</p></td>
+<td><p>MSP</p></td>
+</tr>
+<tr class="even">
+<td><p>Cipher</p></td>
+<td><p>Block [b]</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">AES</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Chaskey</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Chaskey-LTS</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Fantomas</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">HIGHT</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">LBlock</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">LEA</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">LED</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Lilliput</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Piccolo</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">PRESENT</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">PRIDE</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">PRINCE</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">RC5-20</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">RECTANGLE</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">RECTANGLE</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">RoadRunneR</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">RoadRunneR</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Robin</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#" title="wikilink">Robin*</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Simon</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Simon</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">SKINNY</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">SKINNY</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">SPARX</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">SPARX</a></p></td>
+<td><p>128</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Speck</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="even">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">Speck</a></p></td>
+<td><p>64</p></td>
+</tr>
+<tr class="odd">
+<td><p><a href="Lightweight_Block_Ciphers#01" title="wikilink">TWINE</a></p></td>
+<td><p>64</p></td>
+</tr>
+</tbody>
+</table>
+<p><span style="color: red"><strong>Note:</strong> </span></p>
+<ul>
+<li>Block and key sizes are expressed in bits [b].</li>
+<li>Code size (Code) and RAM consumption (RAM) are expressed in bytes [B].</li>
+<li>Execution time (Time) is expressed in cycles [cyc.].</li>
+<li>Security level (Sec.) is the ratio of the number of rounds broken in a single key setting to the total number of rounds.</li>
+<li>For ciphers against which there is no attack (to the best of our knowledge) the security level is set to -1.</li>
+<li>Details about cryptographic properties of each cipher are available <a href="Lightweight_Block_Ciphers#Summary" title="wikilink">here</a>.</li>
+<li>Results for assembly implementations are displayed in <em>italic</em>.</li>
+<li><em>Cipher-r</em> denotes the cipher <em>Cipher</em> with <em>r</em> rounds instead of the default number of rounds.</li>
+</ul>
+<p><a href="Category:ACRYPT" class="uri" title="wikilink">Category:ACRYPT</a></p>
+</body>
+</html>

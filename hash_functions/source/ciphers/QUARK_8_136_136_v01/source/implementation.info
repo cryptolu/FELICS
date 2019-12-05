@@ -1,0 +1,18 @@
+ImplementationDescription: This is UQUARK implemenation in C.
+ImplementationAuthors: Virat Shejwalkar
+
+InitializationConstants: uquark_iv
+UpdateConstants:
+FinalizationConstants:
+
+InitializationCode:
+UpdateCode: permute, reverse_byte
+FinalizationCode: permute, reverse_byte
+
+UseFinalization: yes
+UseInitialization: yes
+
+ImplementationAVR: C
+ImplementationMSP: C
+ImplementationARM: C
+ImplementationPC: C

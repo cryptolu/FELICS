@@ -1,0 +1,26 @@
+ImplementationDescription: "8-bit Fast Grain128-AEAD" implementation with some help of builtin assembly in C code (target: AVR)
+ImplementationAuthors: Alexander Maximov
+
+InitializationConstants:
+ProcessAssociatedDataConstants:
+ProcessPlaintextConstants:
+FinalizationConstants:
+TagGenerationConstants:
+ProcessCiphertextConstants:
+
+InitializationCode: grain_update
+ProcessAssociatedDataCode: grain_update, grain_getz, grain_auth
+ProcessPlaintextCode: grain_encdec, grain_update, grain_getz, grain_auth
+FinalizationCode:
+TagGenerationCode:
+ProcessCiphertextCode: grain_encdec, grain_update, grain_getz, grain_auth
+
+UseFinalization: no
+
+ProcessEmptyAssociatedData: yes
+ProcessEmptyMessage: yes
+
+ImplementationAVR: C+ASM
+ImplementationMSP: no
+ImplementationARM: no
+ImplementationPC: no

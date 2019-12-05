@@ -1,0 +1,18 @@
+ImplementationDescription: This is identity hash framework of UQUARK for FELICS HASH architecture
+ImplementationAuthors: Virat Shejwalkar
+
+InitializationConstants:
+CompressionConstants:
+FinalizationConstants:
+
+InitializationCode:
+CompressionCode:
+FinalizationCode:
+
+UseFinalization: no
+UseInitialization: no
+
+ImplementationAVR: C
+ImplementationMSP: C
+ImplementationARM: C
+ImplementationPC: C

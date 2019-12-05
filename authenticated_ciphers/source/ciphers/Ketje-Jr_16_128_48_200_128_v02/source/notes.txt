@@ -1,0 +1,56 @@
+Code
+====
+KeccakP200_Permute_Nrounds (keccak_round.c) called in:
+    ketjr_step
+    I
+    PPD
+    PCD
+KetJr_AddBytes (ketjr_addbytes.c) called in:
+    PAD
+    PPD
+    PCD
+KetJr_StateExtractByte (ketJr_stateextractbyte.c) called in:
+    TG
+    PPD
+    PCD
+KetJr_StateOverwrite (ketjr_stateoverwrite.c) called in:
+    I
+KetJr_Step (ketjr_step.c) called in:
+    TG
+    PAD
+
+
+Results
+-------
+I:
+    keccak_round
+    ketjr_stateoverwrite
+PAD:
+    ketjr_addbytes
+    ketjr_step ->+ keccak_round
+PPD:
+    keccak_round
+    ketjr_addbytes
+    ketJr_stateextractbyte
+PCD:
+    keccak_round
+    ketjr_addbytes
+    ketJr_stateextractbyte
+TG:
+    ketJr_stateextractbyte
+    ketjr_step ->+ keccak_round
+
+
+Data
+====
+KeccakRoundConstants
+    keccak_round
+KeccakRhoOffsets
+    keccak_round
+KetJr_StateTwistIndexes
+    ketjr_step
+    I
+    ketJr_stateextractbyte
+    PAD
+    PPD
+    PCD

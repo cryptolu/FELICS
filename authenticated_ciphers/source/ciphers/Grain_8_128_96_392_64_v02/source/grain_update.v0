@@ -1,0 +1,178 @@
+/*
+   Copyright : 2019 (C) Design team of Grain128-AEAD
+   License   : We grant a free license to use and modify the code by anyone and in any way, for any purpose
+   Cipher    : Grain128-AEAD for FELICS-AEAD framework
+   Target    : 8-bit AVR ATMega 128, Fast speed code (C+ASM)
+   Author    : Alexander Maximov
+   Date      : 2019-11-25
+ */
+
+#include "grain_common.h"
+#include "constants.h"
+
+static inline uint8_t SWAP(uint8_t x)
+{	return (x>>4)|(x<<4);	/* this compiles into a single AVR instruction (swap rd) */
+}
+
+// AVR low level assembly instructions
+#ifdef WIN32
+static uint8_t carry = 0;
+#define LSL(var) do{ carry = var>>7, var <<= 1; }while(0)
+#define LSR(var) do{ carry = var&1, var >>= 1; }while(0)
+#define ROL(var) do{ carry |= (var>>6)&2, var = (var<<1)|(carry&1), carry>>=1; }while(0)
+#define ROR(var) do{ carry |= (var<<1)&2, var = (var>>1)|(carry<<7), carry>>=1; }while(0)
+#else
+#define LSL(var) asm volatile("lsl    %0 \n\t" : "=r" (var) : "0" (var))
+#define LSR(var) asm volatile("lsr    %0 \n\t" : "=r" (var) : "0" (var))
+#define ROL(var) asm volatile("rol    %0 \n\t" : "=r" (var) : "0" (var))
+#define ROR(var) asm volatile("ror    %0 \n\t" : "=r" (var) : "0" (var))
+#endif
+
+uint8_t grain_update(GrainState * g)
+{	
+/* #	define LF(i, j) (uint8_t)((*(uint16_t*)(g->lfsr + i)) >> j) */
+/* #	define NF(i, j) (uint8_t)((*(uint16_t*)(g->nfsr + i)) >> j) */
+
+	// At most 18 registers to be used, but I think less
+	uint8_t r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12;
+	uint8_t y, ln, nn, a, b;
+
+	// LOAD-L: 0,1,4,5,8,9,10,11,12
+	r0 = g->lfsr[0], r1 = g->lfsr[1], r4 = g->lfsr[4], r5 = g->lfsr[5], 
+	r8 = g->lfsr[8], r9 = g->lfsr[9], r10= g->lfsr[10], r11=g->lfsr[11], 
+	r12 = g->lfsr[12];
+	
+	// STORE-L: 0,4,8,9,10,11,12,13,14
+	g->lfsr[0] = r1, g->lfsr[4] = r5;
+	g->lfsr[8] = r9, g->lfsr[9] = r10, g->lfsr[10] = r11, g->lfsr[11] = r12;
+	g->lfsr[12] = g->lfsr[13], g->lfsr[13] = g->lfsr[14], g->lfsr[14] = g->lfsr[15];
+	
+	// immediate expressions
+	ln = nn = r0;
+	ln ^= r12;
+	
+	// ln ^= LF(4, 6) ^ LF(8, 6) ^ LF(0, 7);
+	b = r5 ^ r9, a = r4 ^ r8; LSL(a); ROL(b); b^=r1, a^=r0; LSL(a); ROL(b); ln^=b;
+
+	// ln ^= LF(10, 1);
+	b = r11, a = r10; LSR(b); ROR(a); ln^=a;
+	
+	// STORE-L: 15
+	g->lfsr[15] = ln;
+
+	// t1 = LF(11, 6);
+	LSL(r11); ROL(r12); LSL(r11); ROL(r12); r0 = r12;
+
+	// y = LF(11, 5);
+	LSL(r11); ROL(r12); y = r12;
+	
+	// LOAD-L: 2,3 STORE-L:1,2,3
+	r2 = g->lfsr[2], r3 = g->lfsr[3];
+	g->lfsr[1] = r2, g->lfsr[2] = r3, g->lfsr[3] = r4;
+
+	// y^= LF(1, 5) & LF(2, 4);
+	b=r2, a=r1; LSR(b); ROR(a); b&=r3; a&=r2; b&=0x0f, a&=0xf0; b^=a; b = SWAP(b); y^=b;
+
+	// LOAD-L: 6,7 STORE-L: 5,6,7
+	r6 = g->lfsr[6], r7 = g->lfsr[7];
+	g->lfsr[5] = r6, g->lfsr[6] = r7, g->lfsr[7] = r8;
+
+	// t0 = LF(5, 2);
+	LSR(r6); ROR(r5); LSR(r6); ROR(r5);
+
+	// y^= LF(7, 4) & LF(9, 7);
+	r8&=0x0f, r7&=0xf0, r7 ^= r8; r7 = SWAP(r7); LSL(r9); ROL(r10); r7&=r10; y^=r7;
+
+	// LOAD-N: 1,2,11,12
+	r3 = a = g->nfsr[1], r2 = g->nfsr[2], r11 = g->nfsr[11], r12 = g->nfsr[12];
+
+	// immediate expressions
+	nn ^= r12;
+
+	// STORE-N: 1,11
+	g->nfsr[1] = r2, g->nfsr[11] = r12;
+	g->nfsr[12]=g->nfsr[13], g->nfsr[13]=g->nfsr[14], g->nfsr[14]=g->nfsr[15];
+	
+	// nf14 = NF(1, 4);
+	b = r2; b&=0x0f, a&=0xf0; b^=a; b=SWAP(b);
+	
+	// r0 = (r5 ^ (nf14 & r0));
+	r0 &= b, r0 ^= r5;
+
+	// y ^= nf14 & r1; and restore r1=N[1]
+	r1 &= b, y^=r1; r1 = r3;
+
+	// nf95 = NF(11, 7);
+	r3=r12, a=r11; LSL(a); ROL(r3); 
+	
+	// y ^= (nf95 & r0);
+	r0 &= r3, y^=r0;
+
+	// b = NF(11, 4) & NF(11, 5)
+	b=r12, a=r11; LSR(b); ROR(a); b&=r12, a&=r11; b&=0x0f, a&=0xf0; b^=a; b=SWAP(b);
+
+	// nn ^= r11 & r3 & b;
+	b&=r11, b&=r3, nn^=b;
+
+	// LOAD-N: 3,4,7,8,9,10
+	nn ^= r0 = g->nfsr[0];
+	r3 = g->nfsr[3], r4 = g->nfsr[4], r10 = g->nfsr[10]; 
+	r7 = g->nfsr[7], r8 = g->nfsr[8], r9 = g->nfsr[9];
+
+	// STORE-N: 0,3,7,8,9
+	g->nfsr[0] = r1, g->nfsr[2] = r3, g->nfsr[3] = r4, g->nfsr[7] = r8, 
+	g->nfsr[8] = r9, g->nfsr[9] = r10, g->nfsr[10] = r11;
+	
+	y ^= r8;
+
+	//nn ^= NF(1, 3) & NF(1, 5);
+	//nn ^= NF(11, 3);
+	//nn ^= NF(0, 3) & NF(8, 3);
+	//nn ^= NF(3, 3) & NF(7, 3);
+	//nn ^= NF(3, 2); 
+	//nn ^= NF(8, 4) & NF(10, 4);
+	r5=r8 & r10, r6=r9 & r11; LSR(r6); ROR(r5);
+	b=r2, a=r1; LSR(b); ROR(a); LSR(b); ROR(a);
+	a = (a & r1) ^ r11 ^ r5 ^ (r0 & r8) ^ (r3 & r7);
+	b = (b & r2) ^ r12 ^ r6 ^ (r1 & r9) ^ (r4 & r8);
+	LSR(b); ROR(a); a^=r3, b^=r4;
+	LSR(b); ROR(a); 
+
+	// nn ^= NF(2, 1) & NF(2, 2);
+	r6=r3, r5=r2; LSR(r6); ROR(r5); 
+	a ^= (r2 & r5); b ^= (r3 & r6);
+	LSR(b); ROR(a); nn ^= a;
+
+	// LOAD-N: 5,6
+	r5 = g->nfsr[5], r6 = g->nfsr[6];
+	
+	// immediate expression
+	nn ^= r7 ^ (r5 & r6);
+
+	// STORE-N: 4,5,6
+	g->nfsr[4] = r5, g->nfsr[5] = r6, g->nfsr[6] = r7;
+	
+	// y ^= NF(9, 1) ^ NF(11, 1) ^ NF(0, 2);
+	b=r1, a=r0; LSR(b); ROR(a); a ^= r9 ^ r11, b ^= r10 ^ r12; LSR(b); ROR(a); y ^= a;
+
+	// r1* y ^= NF(1, 7);
+	b=r2; LSL(r1); ROL(b); y^=b;
+
+	// r6* y ^= NF(5, 5) ^ NF(4, 4);
+	a=r5; LSR(r6); ROR(a); r6^=r5, a^=r4; r6&=0x0f, a&=0xf0; a^=r6; a=SWAP(a); y^=a;
+
+	// r3, r4* nn ^= NF(2, 6) & r3 & NF(3, 1);
+	b=r3; LSL(r2); ROL(b);LSL(r2); ROL(b); b&=r3; LSR(r4); ROR(r3); b &= r3; nn^=b;
+	
+	// nn ^= NF(8, 1) & NF(7, 5);
+	b=r9, a=r8; LSR(b); ROR(a); b=r8; 
+	LSL(r7); ROL(b); LSL(r7); ROL(b); LSL(r7); ROL(b); nn ^= a & b;
+	
+	// nn ^= NF(8, 6) & NF(9, 6) & NF(10, 2);
+	r8&=r9, r9&=r10; LSL(r8); ROL(r9); LSL(r8); ROL(r9);
+	LSR(r11); ROR(r10); LSR(r11); ROR(r10); nn^=r9 & r10;
+
+	g->nfsr[15] = nn;
+	return y;
+}
+

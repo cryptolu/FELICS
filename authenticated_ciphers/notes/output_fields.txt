@@ -1,0 +1,35 @@
+Scenarios
+=========
+Sc 0: verification of implementation's correctness using KATs
+Sc 1: encryption + authentication of 128 bytes of data (message) and 128 bits of associated data
+Sc 2: encryption + authentication of 128 bytes of data
+Sc 3: only encryption of 128 bytes of data
+Sc 4: only authentication of 128 bits of associated data
+
+
+Output Formats -m=1
+===================
+
+CS
+==
+Sc 0: Initialize, PAD, PPD, Finalize, TG, PCD, TV, Total E, Total D, Total
+Sc 1: Initialize, PAD, PPD, Finalize, TG, PCD, TV, Total E, Total D, Total
+Sc 2: Initialize, PAD, PPD, Finalize, TG, PCD, TV, Total E, Total D, Total
+Sc 3: Initialize, PAD, PPD, Finalize, TG, PCD, TV, Total E, Total D, Total
+Sc 4: Initialize, PAD, PPD, Finalize, TG, PCD, TV, Total E, Total D, Total
+
+RAM
+===
+Sc 0: Initiliaze, PAD, PPD, Finalize, PG, PCD, PV
+Sc 1: Stack(Initiliaze, PAD, PPD, Finalize, TG, PCD, TV), Data(Initiliaze, PAD, PPD, Finalize, TG, PCD, TV, Common, Total E, Total D, Total)
+Sc 2: Stack(Initiliaze, PAD, PPD, Finalize, TG, PCD, TV), Data(Initiliaze, PAD, PPD, Finalize, TG, PCD, TV, Common, Total E, Total D, Total)
+Sc 3: Stack(Initiliaze, PAD, PPD, Finalize, TG, PCD, TV), Data(Initiliaze, PAD, PPD, Finalize, TG, PCD, TV, Common, Total E, Total D, Total)
+Sc 4: Stack(Initiliaze, PAD, PPD, Finalize, TG, PCD, TV), Data(Initiliaze, PAD, PPD, Finalize, TG, PCD, TV, Common, Total E, Total D, Total)
+
+ET
+==
+Sc 0: Initialize, PAD, PPD, Finalize, TG, PCD, TV
+Sc 1: Initialize, PAD, PPD, Finalize, TG, PCD, TV
+Sc 2: Initialize, PAD, PPD, Finalize, TG, PCD, TV
+Sc 3: Initialize, PAD, PPD, Finalize, TG, PCD, TV
+Sc 4: Initialize, PAD, PPD, Finalize, TG, PCD, TV

@@ -1,0 +1,26 @@
+ImplementationDescription: This is Ketje-Jr AEAD implementation with key,nonce:12,10 bytes
+ImplementationAuthors: Guido Bertoni, Virat Shejwalkar, 3D
+
+InitializationConstants: KetJr_StateTwistIndexes, KeccakRhoOffsets, KeccakRoundConstants
+ProcessAssociatedDataConstants: KetJr_StateTwistIndexes, KeccakRhoOffsets, KeccakRoundConstants
+ProcessPlaintextConstants: KetJr_StateTwistIndexes, KeccakRhoOffsets, KeccakRoundConstants
+FinalizationConstants:
+TagGenerationConstants: KetJr_StateTwistIndexes, KeccakRhoOffsets, KeccakRoundConstants
+ProcessCiphertextConstants: KetJr_StateTwistIndexes, KeccakRhoOffsets, KeccakRoundConstants
+
+InitializationCode: keccak_round, ketjr_stateoverwrite
+ProcessAssociatedDataCode: ketjr_addbyted, ketjr_step, keccak_round
+ProcessPlaintextCode: keccak_round, ketjr_stateextractbyte, ketjr_addbytes
+FinalizationCode:
+TagGenerationCode: ketjr_step, ketjr_stateextractbyte, keccak_round
+ProcessCiphertextCode: keccak_round, ketjr_stateextractbyte, ketjr_addbytes
+
+UseFinalization: no
+
+ProcessEmptyAssociatedData: yes
+ProcessEmptyMessage: yes
+
+ImplementationAVR: C
+ImplementationMSP: C
+ImplementationARM: C
+ImplementationPC: C

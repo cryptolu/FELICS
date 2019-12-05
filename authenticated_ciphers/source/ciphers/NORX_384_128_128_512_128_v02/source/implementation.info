@@ -1,0 +1,26 @@
+ImplementationDescription: reference implementation of NORX cipher with 6 rounds in compression
+ImplementationAuthors: Samuel Neves, Philipp Jovanovic, Virat Shejwalkar
+
+InitializationConstants:
+ProcessAssociatedDataConstants:
+ProcessPlaintextConstants:
+FinalizationConstants:
+TagGenerationConstants:
+ProcessCiphertextConstants:
+
+InitializationCode: permute
+ProcessAssociatedDataCode: permute, absorption, padding
+ProcessPlaintextCode: permute, padding
+FinalizationCode: permute
+TagGenerationCode:
+ProcessCiphertextCode: permute
+
+UseFinalization: yes
+
+ProcessEmptyAssociatedData: no
+ProcessEmptyMessage: no
+
+ImplementationAVR: C
+ImplementationMSP: C
+ImplementationARM: C
+ImplementationPC: C

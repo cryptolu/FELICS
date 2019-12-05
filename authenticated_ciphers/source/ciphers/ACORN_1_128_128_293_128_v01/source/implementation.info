@@ -1,0 +1,26 @@
+ImplementationDescription: ACORN implementation with 32bits of the state processed at a time
+ImplementationAuthors: Hongjun Wu, Virat Shejwalkar
+
+InitializationConstants:
+ProcessAssociatedDataConstants:
+ProcessPlaintextConstants:
+FinalizationConstants:
+TagGenerationConstants:
+ProcessCiphertextConstants:
+
+InitializationCode: permute
+ProcessAssociatedDataCode: permute, padding
+ProcessPlaintextCode: permute, padding
+FinalizationCode:
+TagGenerationCode: permute
+ProcessCiphertextCode: permute, padding
+
+UseFinalization: no
+
+ProcessEmptyAssociatedData: yes
+ProcessEmptyMessage: yes
+
+ImplementationAVR: C
+ImplementationMSP: C
+ImplementationARM: C
+ImplementationPC: C

@@ -1,0 +1,20 @@
+ImplementationDescription: Assembler implementation; unroll 8 rounds for AVR and ARM; unroll 4 round for MSP
+ImplementationAuthors: Nicky Mouha, Virat Shejwalkar, Daniel Dinu
+
+EncryptionKeyScheduleConstants: 
+EncryptConstants:
+DecryptionKeyScheduleConstants:
+DecryptConstants:
+
+EncryptionKeyScheduleCode:
+EncryptCode: 
+DecryptionKeyScheduleCode:
+DecryptCode:
+
+UseEncryptionKeySchedule: no
+UseDecryptionKeySchedule: no
+
+ImplementationAVR: ASM
+ImplementationMSP: ASM
+ImplementationARM: ASM
+ImplementationPC: C

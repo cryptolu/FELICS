@@ -1,0 +1,40 @@
+/*
+   Copyright : 2019 (C) Design team of Grain128-AEAD
+   License   : We grant a free license to use and modify the code by anyone and in any way, for any purpose
+   Cipher    : Grain128-AEAD for FELICS-AEAD framework
+   Target    : 16-bit MSP430F1611, Fast speed code (C+ASM)
+   Author    : Alexander Maximov
+   Date      : 2019-11-25
+ */
+
+#include "grain_common.h"
+
+uint16_t grain_update(GrainState * g)
+{	
+	uint16_t ln, nn, y, i;
+
+#define LF(i) (uint16_t)((*(uint32_t*)(g->lfsr + (i/16))) >> (i%16))
+#define NF(i) (uint16_t)((*(uint32_t*)(g->nfsr + (i/16))) >> (i%16))
+
+	ln = LF(0) ^ LF(7) ^ LF(38) ^ LF(70) ^ LF(81) ^ LF(96);
+
+	nn = LF(0) ^ NF(0) ^ NF(26) ^ NF(56) ^ NF(91) ^ NF(96);
+	nn ^= NF(3) & NF(67);
+	nn ^= NF(11) & NF(13);
+	nn ^= NF(17) & NF(18);
+	nn ^= NF(27) & NF(59);
+	nn ^= NF(40) & NF(48);
+	nn ^= NF(61) & NF(65);
+	nn ^= NF(68) & NF(84);
+	nn ^= NF(22) & NF(24) & NF(25);
+	nn ^= NF(70) & NF(78) & NF(82);
+	nn ^= NF(88) & NF(92) & NF(93) & NF(95);
+
+	y = (NF(12) & LF(8)) ^ (LF(13) & LF(20)) ^ (NF(95) & LF(42)) ^ (LF(60) & LF(79)) ^ (NF(12) & NF(95) & LF(94));
+	y^= LF(93) ^ NF(2) ^ NF(15) ^ NF(36) ^ NF(45) ^ NF(64) ^ NF(73) ^ NF(89);
+
+	memcpy(g->lfsr, g->lfsr + 1, 30);
+	g->lfsr[7] = ln;
+	g->nfsr[7] = nn;
+	return y;
+}

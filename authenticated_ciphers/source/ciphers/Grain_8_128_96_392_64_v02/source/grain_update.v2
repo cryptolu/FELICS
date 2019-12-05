@@ -1,0 +1,475 @@
+/*
+   Copyright : 2019 (C) Design team of Grain128-AEAD
+   License   : We grant a free license to use and modify the code by anyone and in any way, for any purpose
+   Cipher    : Grain128-AEAD for FELICS-AEAD framework
+   Target    : 8-bit AVR ATMega 128, Fast speed code (C+ASM)
+   Author    : Alexander Maximov
+   Date      : 2019-11-25
+ */
+
+#include "grain_common.h"
+#include "constants.h"
+
+#if defined(AVR) || defined(__AVR__)
+#define IS_AVR 1
+#else
+#define IS_AVR 0
+#endif
+
+// In case of AVR platform => use builting assembly code
+#if IS_AVR
+#define xstr(s) str(s)
+#define str(s) #s
+#define R(i) "%" xstr(i)
+#define LFSR(i) "%a18+" xstr(i)
+#define NFSR(i) "%a18+16+" xstr(i)
+#define OP1(op, reg) #op " " reg " \n\t"
+#define OP2(op, reg1, reg2) #op " " reg1 ", " reg2 " \n\t"
+#define TREG " __tmp_reg__"
+#define R_A 	R(13)
+#define R_B 	R(14)
+#define R_Y 	R(15)
+#define R_LN 	R(16)
+#define R_NN 	R(17)
+#else
+// Otherwise, emulate AVR instructions so that we can test the code
+static uint8_t CR = 0, TREG;
+#define ldd(out, in)	out = in;
+#define std(out, in)	out = in;
+#define mov(out, in)	out = in;
+#define eor(out, in)	out ^= in;
+#define and(out, in)	out &= in;
+#define lsl(var) CR = var>>7, var <<= 1;
+#define lsr(var) CR = var&1, var >>= 1;
+#define rol(var) CR |= (var>>6)&2, var = (var<<1)|(CR&1), CR>>=1;
+#define ror(var) CR |= (var<<1)&2, var = (var>>1)|(CR<<7), CR>>=1;
+#define andi(var, imm) var &= strtol(imm, NULL, 0);
+#define swap(var)	var = (var>>4)|(var<<4);
+#define R(i)	r##i
+#define R_A 	a
+#define R_B 	b
+#define R_Y 	y
+#define R_LN 	ln
+#define R_NN 	nn
+#define LFSR(i)	g->lfsr[i]
+#define NFSR(i)	g->nfsr[i]
+#define OP1(op, var)			op(var)
+#define OP2(op, out, in)		op(out, in)
+#endif
+
+
+uint8_t grain_update(GrainState * g)
+{	
+	uint8_t r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12;
+	uint8_t y, ln, nn, a, b;
+
+#if IS_AVR
+	__asm__ __volatile__(
+#endif
+	// LOAD-L: 0,1,4,5,8,9,12
+	OP2(ldd, R(0), LFSR(0))
+	OP2(ldd, R(1), LFSR(1))
+	OP2(ldd, R(4), LFSR(4))
+	OP2(ldd, R(5), LFSR(5))
+	OP2(ldd, R(8), LFSR(8))
+	OP2(ldd, R(9), LFSR(9))
+	OP2(ldd, R(12), LFSR(12))
+
+	// STORE-L: 0,4,8,9,10,11,12,13,14
+	OP2(std, LFSR(0), R(1))
+	OP2(std, LFSR(4), R(5))
+	OP2(std, LFSR(8), R(9))
+	OP2(ldd, TREG, LFSR(13))
+	OP2(std, LFSR(12), TREG)
+	OP2(ldd, TREG, LFSR(14))
+	OP2(std, LFSR(13), TREG)
+	OP2(ldd, TREG, LFSR(15))
+	OP2(std, LFSR(14), TREG)
+
+	// immediate expressions
+	OP2(mov, R_LN, R(0))
+	OP2(mov, R_NN, R(0))
+	OP2(eor, R_LN, R(12))
+
+	// ln ^= LF(4, 6) ^ LF(8, 6) ^ LF(0, 7);
+	OP2(mov, R_B, R(5))
+	OP2(eor, R_B, R(9))
+	OP2(mov, R_A, R(4))
+	OP2(eor, R_A, R(8))
+	OP1(lsl, R_A)
+	OP1(rol, R_B)
+	OP2(eor, R_B, R(1))
+	OP2(eor, R_A, R(0))
+	OP1(lsl, R_A)
+	OP1(rol, R_B)
+	OP2(eor, R_LN, R_B)
+
+	//r10 = g->lfsr[10], r11 = g->lfsr[11],
+	//g->lfsr[9] = r10, g->lfsr[10] = r11, g->lfsr[11] = r12;
+	OP2(ldd, R(10), LFSR(10))
+	OP2(ldd, R(11), LFSR(11))
+	OP2(std, LFSR(9), R(10))
+	OP2(std, LFSR(10), R(11))
+	OP2(std, LFSR(11), R(12))
+
+	// ln ^= LF(10, 1);
+	// b = r11, a = r10; LSR(b); ROR(a); ln^=a;
+	OP2(mov, R_B, R(11))
+	OP2(mov, R_A, R(10))
+	OP1(lsr, R_B)
+	OP1(ror, R_A)
+	OP2(eor, R_LN, R_A)
+
+	// STORE-L: 15
+	// g->lfsr[15] = ln;
+	OP2(std, LFSR(15), R_LN)
+
+	// t1 = LF(11, 6);
+	// LSL(r11); ROL(r12); LSL(r11); ROL(r12); r0 = r12;
+	OP1(lsl, R(11))
+	OP1(rol, R(12))
+	OP1(lsl, R(11))
+	OP1(rol, R(12))
+	OP2(mov, R(0), R(12))
+
+	// y = LF(11, 5);
+	// LSL(r11); ROL(r12); y = r12;
+	OP1(lsl, R(11))
+	OP1(rol, R(12))
+	OP2(mov, R_Y, R(12))
+
+	// LOAD-L: 2,3 STORE-L:1,2,3
+	// r2 = g->lfsr[2], r3 = g->lfsr[3];
+	// g->lfsr[1] = r2, g->lfsr[2] = r3, g->lfsr[3] = r4;
+	OP2(ldd, R(2), LFSR(2))
+	OP2(ldd, R(3), LFSR(3))
+	OP2(std, LFSR(1), R(2))
+	OP2(std, LFSR(2), R(3))
+	OP2(std, LFSR(3), R(4))
+
+	// y^= LF(1, 5) & LF(2, 4);
+	// b=r2, a=r1; LSR(b); ROR(a); b&=r3; a&=r2; 
+	// b&=0x0f, a&=0xf0; b^=a; b = SWAP(b); y^=b;
+	OP2(mov, R_B, R(2))
+	OP2(mov, R_A, R(1))
+	OP1(lsr, R_B)
+	OP1(ror, R_A)
+	OP2(and, R_B, R(3))
+	OP2(and, R_A, R(2))
+	OP2(andi, R_B, "0x0f")
+	OP2(andi, R_A, "0xf0")
+	OP2(eor, R_B, R_A)
+	OP1(swap, R_B)
+	OP2(eor, R_Y, R_B)
+
+	// LOAD-L: 6,7 STORE-L: 5,6,7
+	// r6 = g->lfsr[6], r7 = g->lfsr[7];
+	// g->lfsr[5] = r6, g->lfsr[6] = r7, g->lfsr[7] = r8;
+	OP2(ldd, R(6), LFSR(6))
+	OP2(ldd, R(7), LFSR(7))
+	OP2(std, LFSR(5), R(6))
+	OP2(std, LFSR(6), R(7))
+	OP2(std, LFSR(7), R(8))
+
+	// t0 = LF(5, 2);
+	// LSR(r6); ROR(r5); LSR(r6); ROR(r5);
+	OP1(lsr, R(6))
+	OP1(ror, R(5))
+	OP1(lsr, R(6))
+	OP1(ror, R(5))
+
+	// y^= LF(7, 4) & LF(9, 7);
+	// r8&=0x0f, r7&=0xf0, r7 ^= r8; r7 = SWAP(r7); 
+	// LSL(r9); ROL(r10); r7&=r10; y^=r7;
+	OP2(andi, R(8), "0x0f")
+	OP2(andi, R(7), "0xf0")
+	OP2(eor, R(7), R(8))
+	OP1(swap, R(7))
+	OP1(lsl, R(9))
+	OP1(rol, R(10))
+	OP2(and, R(7), R(10))
+	OP2(eor, R_Y, R(7))
+
+	// LOAD-N: 1,2,11,12
+	// r3 = a = g->nfsr[1], r2 = g->nfsr[2], r11 = g->nfsr[11], r12 = g->nfsr[12];
+	OP2(ldd, R_A, NFSR(1))
+	OP2(mov, R(3), R_A)
+	OP2(ldd, R(2), NFSR(2))
+	OP2(ldd, R(11), NFSR(11))
+	OP2(ldd, R(12), NFSR(12))
+
+	// immediate expressions
+	// nn ^= r12;
+	OP2(eor, R_NN, R(12))
+
+	// STORE-N: 1,11
+	// g->nfsr[1] = r2, g->nfsr[11] = r12;
+	// g->nfsr[12]=g->nfsr[13], g->nfsr[13]=g->nfsr[14], g->nfsr[14]=g->nfsr[15];
+	OP2(std, NFSR(1), R(2))	
+	OP2(std, NFSR(11), R(12))
+	OP2(ldd, TREG, NFSR(13))
+	OP2(std, NFSR(12), TREG)
+	OP2(ldd, TREG, NFSR(14))
+	OP2(std, NFSR(13), TREG)
+	OP2(ldd, TREG, NFSR(15))
+	OP2(std, NFSR(14), TREG)
+
+	// nf14 = NF(1, 4);
+	// b = r2; b&=0x0f, a&=0xf0; b^=a; b=SWAP(b);
+	OP2(mov, R_B, R(2))
+	OP2(andi, R_B, "0x0f")
+	OP2(andi, R_A, "0xf0")
+	OP2(eor, R_B, R_A)
+	OP1(swap, R_B)
+
+	// r0 = (r5 ^ (nf14 & r0));
+	// r0 &= b, r0 ^= r5;
+	OP2(and, R(0), R_B)
+	OP2(eor, R(0), R(5))
+
+	// y ^= nf14 & r1; and restore r1=N[1]
+	// r1 &= b, y^=r1; r1 = r3;
+	OP2(and, R(1), R_B)
+	OP2(eor, R_Y, R(1))
+	OP2(mov, R(1), R(3))
+
+	// nf95 = NF(11, 7);
+	// r3=r12, a=r11; LSL(a); ROL(r3); 
+	OP2(mov, R(3), R(12))
+	OP2(mov, R_A, R(11))
+	OP1(lsl, R_A)
+	OP1(rol, R(3))
+
+	// y ^= (nf95 & r0);
+	// r0 &= r3, y^=r0;
+	OP2(and, R(0), R(3))
+	OP2(eor, R_Y, R(0))
+
+	// b = NF(11, 4) & NF(11, 5)
+	// b=r12, a=r11; LSR(b); ROR(a); b&=r12, a&=r11; 
+	// b&=0x0f, a&=0xf0; b^=a; b=SWAP(b);
+	OP2(mov, R_B, R(12))
+	OP2(mov, R_A, R(11))
+	OP1(lsr, R_B)
+	OP1(ror, R_A)
+	OP2(and, R_B, R(12))
+	OP2(and, R_A, R(11))
+	OP2(andi, R_B, "0x0f")
+	OP2(andi, R_A, "0xf0")
+	OP2(eor, R_B, R_A)
+	OP1(swap, R_B)
+
+	// nn ^= r11 & r3 & b;
+	// b&=r11, b&=r3, nn^=b;
+	OP2(and, R_B, R(11))
+	OP2(and, R_B, R(3))
+	OP2(eor, R_NN, R_B)
+
+	// LOAD-N: 3,4,7,8,9,10
+	// nn ^= r0 = g->nfsr[0];
+	// r3 = g->nfsr[3], r4 = g->nfsr[4], r10 = g->nfsr[10]; 
+	// r7 = g->nfsr[7], r8 = g->nfsr[8], r9 = g->nfsr[9];
+	OP2(ldd, R(0), NFSR(0))
+	OP2(eor, R_NN, R(0))
+	OP2(ldd, R(3), NFSR(3))
+	OP2(ldd, R(4), NFSR(4))
+	OP2(ldd, R(7), NFSR(7))
+	OP2(ldd, R(8), NFSR(8))
+	OP2(ldd, R(9), NFSR(9))
+	OP2(ldd, R(10), NFSR(10))
+
+	// STORE-N: 0,3,7,8,9
+	// g->nfsr[0] = r1, g->nfsr[2] = r3, g->nfsr[3] = r4, g->nfsr[7] = r8, 
+	// g->nfsr[8] = r9, g->nfsr[9] = r10, g->nfsr[10] = r11;
+	OP2(std, NFSR(0), R(1))
+	OP2(std, NFSR(2), R(3))
+	OP2(std, NFSR(3), R(4))
+	OP2(std, NFSR(7), R(8))
+	OP2(std, NFSR(8), R(9))
+	OP2(std, NFSR(9), R(10))
+	OP2(std, NFSR(10), R(11))
+	
+	// y ^= r8;
+	OP2(eor, R_Y, R(8))
+
+	//nn ^= NF(1, 3) & NF(1, 5);
+	//nn ^= NF(11, 3);
+	//nn ^= NF(0, 3) & NF(8, 3);
+	//nn ^= NF(3, 3) & NF(7, 3);
+	//nn ^= NF(3, 2); 
+	//nn ^= NF(8, 4) & NF(10, 4);
+	// r5=r8 & r10, r6=r9 & r11; LSR(r6); ROR(r5);
+	// b=r2, a=r1; LSR(b); ROR(a); LSR(b); ROR(a);
+	OP2(mov, R(5), R(8))
+	OP2(and, R(5), R(10))
+	OP2(mov, R(6), R(9))
+	OP2(and, R(6), R(11))
+	OP1(lsr, R(6))
+	OP1(ror, R(5))
+	OP2(mov, R_B, R(2))
+	OP2(mov, R_A, R(1))
+	OP1(lsr, R_B)
+	OP1(ror, R_A)
+	OP1(lsr, R_B)
+	OP1(ror, R_A)
+
+	//a = (a & r1) ^ r11 ^ r5 ^ (r0 & r8) ^ (r3 & r7);
+	OP2(and, R_A, R(1))
+	OP2(eor, R_A, R(11))
+	OP2(eor, R_A, R(5))
+	OP2(mov, TREG, R(0))
+	OP2(and, TREG, R(8))
+	OP2(eor, R_A, TREG)
+	OP2(mov, TREG, R(3))
+	OP2(and, TREG, R(7))
+	OP2(eor, R_A, TREG)
+
+	//b = (b & r2) ^ r12 ^ r6 ^ (r1 & r9) ^ (r4 & r8);
+	OP2(and, R_B, R(2))
+	OP2(eor, R_B, R(12))
+	OP2(eor, R_B, R(6))
+	OP2(mov, TREG, R(1))
+	OP2(and, TREG, R(9))
+	OP2(eor, R_B, TREG)
+	OP2(mov, TREG, R(4))
+	OP2(and, TREG, R(8))
+	OP2(eor, R_B, TREG)
+	
+	//LSR(b); ROR(a); a^=r3, b^=r4;
+	//LSR(b); ROR(a); 
+	OP1(lsr, R_B)
+	OP1(ror, R_A)
+	OP2(eor, R_A, R(3))
+	OP2(eor, R_B, R(4))
+	OP1(lsr, R_B)
+	OP1(ror, R_A)
+
+	// nn ^= NF(2, 1) & NF(2, 2);
+	//r6=r3, r5=r2; LSR(r6); ROR(r5); 
+	//a ^= (r2 & r5); b ^= (r3 & r6);
+	//LSR(b); ROR(a); nn ^= a;
+	OP2(mov, R(6), R(3))
+	OP2(mov, R(5), R(2))
+	OP1(lsr, R(6))
+	OP1(ror, R(5))
+	OP2(mov, TREG, R(2))
+	OP2(and, TREG, R(5))
+	OP2(eor, R_A, TREG)
+	OP2(mov, TREG, R(3))
+	OP2(and, TREG, R(6))
+	OP2(eor, R_B, TREG)
+	OP1(lsr, R_B)
+	OP1(ror, R_A)
+	OP2(eor, R_NN, R_A)
+
+	// LOAD-N: 5,6
+	// r5 = g->nfsr[5], r6 = g->nfsr[6];
+	OP2(ldd, R(5), NFSR(5))
+	OP2(ldd, R(6), NFSR(6))
+
+	// STORE-N: 4,5,6
+	// g->nfsr[4] = r5, g->nfsr[5] = r6, g->nfsr[6] = r7;
+	OP2(std, NFSR(4), R(5))
+	OP2(std, NFSR(5), R(6))
+	OP2(std, NFSR(6), R(7))
+	
+	// immediate expression
+	// nn ^= r7 ^ (r5 & r6);
+	OP2(mov, TREG, R(5))
+	OP2(and, TREG, R(6))
+	OP2(eor, R_NN, TREG)
+	OP2(eor, R_NN, R(7))
+
+	// r6* y ^= NF(5, 5) ^ NF(4, 4);
+	//a=r5; LSR(r6); ROR(a); r6^=r5, a^=r4; 
+	// r6&=0x0f, a&=0xf0; a^=r6; a=SWAP(a); y^=a;
+	OP2(mov, R_A, R(5))
+	OP1(lsr, R(6))
+	OP1(ror, R_A)
+	OP2(eor, R(6), R(5))
+	OP2(eor, R_A, R(4))
+	OP2(andi, R(6), "0x0f")
+	OP2(andi, R_A, "0xf0")
+	OP2(eor, R_A, R(6))
+	OP1(swap, R_A)
+	OP2(eor, R_Y, R_A)
+
+	// nn ^= NF(8, 1) & NF(7, 5);
+	//b=r9, a=r8; LSR(b); ROR(a); b=r8; 
+	//LSL(r7); ROL(b); LSL(r7); ROL(b); LSL(r7); ROL(b); nn ^= a & b;
+	OP2(mov, R_B, R(9))
+	OP2(mov, R_A, R(8))
+	OP1(lsr, R_B)
+	OP1(ror, R_A)
+	OP2(mov, R_B, R(8))
+	OP1(lsl, R(7))
+	OP1(rol, R_B)
+	OP1(lsl, R(7))
+	OP1(rol, R_B)
+	OP1(lsl, R(7))
+	OP1(rol, R_B)
+	OP2(and, R_A, R_B)
+	OP2(eor, R_NN, R_A)
+
+	// y ^= NF(9, 1) ^ NF(11, 1) ^ NF(0, 2);
+	// b=r1, a=r0; LSR(b); ROR(a); a ^= r9 ^ r11, b ^= r10 ^ r12; LSR(b); ROR(a); y ^= a;
+	OP2(mov, R_B, R(1))
+	OP1(lsr, R_B)
+	OP1(ror, R(0))
+	OP2(eor, R(0), R(9))
+	OP2(eor, R(0), R(11))
+	OP2(eor, R_B, R(10))
+	OP2(eor, R_B, R(12))
+	OP1(lsr, R_B)
+	OP1(ror, R(0))
+	OP2(eor, R_Y, R(0))
+
+	// y ^= NF(0, 7);
+	// b=r2; LSL(r1); ROL(b); y^=b;
+	OP2(mov, R_B, R(2))
+	OP1(lsl, R(1))
+	OP1(rol, R_B)
+	OP2(eor, R_Y, R_B)
+
+	// r3, r4* nn ^= NF(2, 6) & r3 & NF(3, 1);
+	// b=r3; LSL(r2); ROL(b);LSL(r2); ROL(b); 
+	// b&=r3; LSR(r4); ROR(r3); b &= r3; nn^=b;
+	OP2(mov, R_B, R(3))
+	OP1(lsl, R(2))
+	OP1(rol, R_B)
+	OP1(lsl, R(2))
+	OP1(rol, R_B)
+	OP2(and, R_B, R(3))
+	OP1(lsr, R(4))
+	OP1(ror, R(3))
+	OP2(and, R_B, R(3))
+	OP2(eor, R_NN, R_B)
+
+	// nn ^= NF(7, 6) & NF(8, 6) & NF(9, 2);
+	// r8&=r9, r9&=r10; LSL(r8); ROL(r9); LSL(r8); ROL(r9);
+	// LSR(r11); ROR(r10); LSR(r11); ROR(r10); nn^=r9 & r10;
+	OP2(and, R(8), R(9))
+	OP2(and, R(9), R(10))
+	OP1(lsl, R(8))
+	OP1(rol, R(9))
+	OP1(lsl, R(8))
+	OP1(rol, R(9))
+	OP1(lsr, R(11))
+	OP1(ror, R(10))
+	OP1(lsr, R(11))
+	OP1(ror, R(10))
+	OP2(and, R(9), R(10))
+	OP2(eor, R_NN, R(9))
+
+#if IS_AVR
+	: "=r" (r0), "=r" (r1), "=r" (r2), "=r" (r3), "=r" (r4), "=r" (r5), "=d" (r6), "=d" (r7), "=d" (r8), "=r" (r9), "=r" (r10), "=r" (r11), "=r" (r12),	"=d" (a), "=d" (b), "=r" (y), "=r" (ln), "=r" (nn)
+	: "b" (g)
+	: "memory"
+	);
+#endif
+
+	g->nfsr[15] = nn;
+	//OP2(std, NFSR(15), R_NN)
+	return y;
+}
+

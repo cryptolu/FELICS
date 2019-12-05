@@ -1,0 +1,20 @@
+ImplementationDescription: Lilliput v1 with embedded C best practices
+ImplementationAuthors: Julien Francq and Jean-Baptiste Serrou-Soares
+
+EncryptionKeyScheduleConstants: MULT_constants, SBOX_constants
+EncryptConstants: SBOX_constants
+DecryptionKeyScheduleConstants:
+DecryptConstants: SBOX_constants
+
+EncryptionKeyScheduleCode:
+EncryptCode:
+DecryptionKeyScheduleCode:
+DecryptCode:
+
+UseEncryptionKeySchedule: yes
+UseDecryptionKeySchedule: no
+
+ImplementationAVR: C
+ImplementationMSP: C
+ImplementationARM: C
+ImplementationPC: C

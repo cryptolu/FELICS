@@ -1,0 +1,99 @@
+***There are TODOs in code at few places which should be checked at the end of framework finalization.
+Initiali tasks:
+0. Generate a folder named HashName_DigestSize_BlockSize_StateSize_NumberOfRounds
+	This is the reference folder so add function declarations and definitions in appropriate files and compile it -- DONE
+1. Generate a main() function that has all the functions we have in mind -- DONE
+2. Identify these parts in reference implementations  -- DONE
+3. Port these implementations into the initial framework -- DONE
+4. Compile this with cipher.mk -- DONE
+5. Generate test vectors for scenario-0 which can be later used  for verification of ported implementations -- DONE for - PHOTON-80, PHOTON-128, QUARK, SipHash, BLAKE2s
+
+Progress - 16/07/17
+Added implementations for: PHOTON-80, PHOTON-128, QUARK, SipHash, BLAKE2s. 
+Tested these implementations for scenario-0 which checks the implementation correctness by hashing a message of size BLOCK_SIZE.
+
+Current issues:
+1. The round function of BLAKE2s, implemented as a macro in blake-impl.h file, gives different output for same inputs each time the code is executed - DONE
+
+Sequence of next tasks:
+
+- Correct the implementation of BLAKE2s -DONE
+- Scripts to take care of
+   - check_cipher.sh - DONE
+   - cipher_code_size.sh - DONE
+   - cipher_execution_time.sh - DONE
+   - cipher_ram.sh - DONE
+- Optimize BLAKE2s by making state size 32bytes instead of 64 as in the current implementation
+- formats/info - DONE
+- formats/results - DONE
+- scripts/check_cipher.sh - DONE
+- scripts/collect_cihper_metrics.sh - DONE
+- scripts/get_cipher_info.sh - DONE
+- sceipts/get_results - DONE
+
+Issues: 
+- MSP gives different results when run with script: check_cipher.sh (incorrect) and when run normally (correct) - DONE
+	*NOTE - In case of MSP compiler otimization should be avoided in such encounters. Refer to code of blake2s_round.c
+- MSP is not giving correct results for WordToByte function in PHOTON_* implementations - HIGH - DONE
+	*NOTE - Here MSP is incorrectly calculating expression: (state[i/(CELL_SIZE*MATRIX_SIZE)][(i/CELL_SIZE)%MATRIX_SIZE] & WORDFILTER)>>(CELL_SIZE-min(CELL_SIZE, NoOfBits-i)) which is equivalent to c - WHY?
+- Check if last block processing in SipHash can be moved to Compress() from Finalize() as we have remaining_msg_len param now in Compress() - DOONE
+- Check if some functionality is implemented using a macro, how should its influence in terms of code size, ram, execution time be measured - MED
+
+Scenario-1 tasks:
+- 3 message sizes: 16, 128, 1024 bytes
+- Create a new folder for scenario-1 main function - DONE
+- make changes to make file and try to run it with HashName_DigestSizeInBits_StateSizeInBits_BlockSizeInBits_v01 - DONE
+- For the data inputs, find outputs of corresponding reference hash implementations - DONE
+- *NOTE - PHOTON_80 has block length of 20 bits which needs to be handled carefully. Make changes to the compress function after completing
+  scenario-1 framework. Current implementation is wrong. - HIGH
+- Test scenario-1 inputs for all the implementations in HASH module of FELICS - DONE
+- List the items that need to be displayed in results files - DONE
+- Scripts to take care of
+   - cipher_code_size.sh
+   - cipher_execution_time.sh
+   - cipher_ram.sh
+
+- formats/results
+- scripts/collect_cihper_metrics.sh
+- scripts/get_cipher_info.sh
+- sceipts/get_results
+
+Meeting minutes - 24/07/17
+- Change Compress to Update
+- Change to HashName_Block_State_Digest
+- Check padding usign a padding scenario for all the hash functions
+- Put in README
+  1. constraint: BLOCK_SIZE should be integer number of Bytes. - PHOTON_80 implementation will be removed - DONE
+  2. constraint: DIGEST_SIZE >= 16 bytes - DONE
+  3. rule: specify if mode is SPONGE or not in constants file
+- Implement the version of SipHash that returns 16 bytes of digest
+- Sub-scenarios command files for MSP-execution time and RAM calculation should not have sub-scenario specific commands.
+
+*NOTE - In SipHash MESSAGE_SIZE is needed so we may have to put the message sizes in README file so that if users need they can use them. We might have to inform users of following structure:
+    #if defined(SCENARIO) && (SCENARIO_X == SCENARIO)
+    #define MESSAGE_SIZE SCENARIO_X_MESSAGE_SIZE
+    #endif
+
+*Issues 
+- MSP does not build when DEBUG=0/not set - MED
+- ARM cycle count seems suspicious! - HIGH
+
+*NOTE: For scenario-2 execution times should be adjusted by subtracting time(BeginInitialization - Initialize) and time(BeginFinalizarion - Finalize)
+- Check is this approach is okay?
+time between - 
+  BeginInitialization, Initialize - PC - NA
+  BeginInitialization, Initialize - AVR - 0
+  BeginInitialization, Initialize - MSP - 538
+  BeginInitialization, Initialize - ARM - NA
+
+  BeginFinalization, Finalize - PC - NA
+  BeginFinalization, Finalize - AVR - 11
+  BeginFinalization, Finalize - MSP - 595
+  BeginFinalization, Finalize - ARM - NA
+
+Meeting 16/08/2017
+- Check if HMAC scenario implementation is correct by comparing with OpenSSL implementation of HMAC
+- Change the implementations of HASH so that hash of data chunks, derived from a block of data, equals hash of the block.
+
+!!!Important!!!
+Correct PHOTON AND QUARK implementations

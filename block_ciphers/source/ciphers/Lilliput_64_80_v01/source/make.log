@@ -1,0 +1,106 @@
+---------- Begin cleaning: Lilliput_64_80_v01 ----------
+rm -f *~
+rm -f ./../source/*~
+rm -f ./../../../common/*~
+rm -f ./../build/cipher.elf
+rm -f ./../build/cipher.bin
+rm -f ./../build/cipher.lst
+rm -f ./../build/scenario1.elf
+rm -f ./../build/scenario1.bin
+rm -f ./../build/scenario1.lst
+rm -f ./../build/scenario2.elf
+rm -f ./../build/scenario2.bin
+rm -f ./../build/scenario2.lst
+rm -f ./../build/main.o 
+rm -f ./../build/common.o
+rm -f ./../build/test_vectors.o ./../build/encrypt.o ./../build/decryption_key_schedule.o ./../build/MULT_constants.o ./../build/SBOX_constants.o ./../build/encryption_key_schedule.o ./../build/decrypt.o
+rm -f ./../build/encrypt_scenario1.o ./../build/decrypt_scenario1.o ./../build/scenario1.o
+rm -f ./../build/scenario2.o ./../build/encrypt_scenario2.o ./../build/round_keys.o ./../build/decrypt_scenario2.o
+rm -f ./../build/test_vectors.lst ./../build/encrypt.lst ./../build/decryption_key_schedule.lst ./../build/MULT_constants.lst ./../build/SBOX_constants.lst ./../build/encryption_key_schedule.lst ./../build/decrypt.lst ./../build/main.lst ./../build/common.lst
+rm -f ./../build/encrypt_scenario1.lst ./../build/decrypt_scenario1.lst
+rm -f ./../build/encrypt_scenario2.lst ./../build/round_keys.lst ./../build/decrypt_scenario2.lst
+rm -f ./../build/*.su
+rm -f ./../build/*.map
+---------- End cleaning: Lilliput_64_80_v01 ----------
+Building for PC ...
+Building with DEBUG flag NOT set ...
+Building with SCENARIO flag set to 0 ...
+Building with MEASURE_CYCLE_COUNT flag NOT set ...
+Building with COMPILER_OPTIONS flag set to -O3 ...
+---------- Start building Lilliput_64_80_v01 ----------
+gcc -c -g -fdata-sections -ffunction-sections -Wcast-align -Wsign-compare -Waggregate-return -Wunused -Wfatal-errors -Wl,--gc-sections -Wl,--relax -I../../../../../common/source/pc/include -D PC -D SCENARIO=0 -O3 test_vectors.c -I./../source -I./../../../common -I./../../../../../common/source/rotations -o ./../build/test_vectors.o
+gcc -c -g -fdata-sections -ffunction-sections -Wcast-align -Wsign-compare -Waggregate-return -Wunused -Wfatal-errors -Wl,--gc-sections -Wl,--relax -I../../../../../common/source/pc/include -D PC -D SCENARIO=0 -O3 encrypt.c -I./../source -I./../../../common -I./../../../../../common/source/rotations -o ./../build/encrypt.o
+gcc -c -g -fdata-sections -ffunction-sections -Wcast-align -Wsign-compare -Waggregate-return -Wunused -Wfatal-errors -Wl,--gc-sections -Wl,--relax -I../../../../../common/source/pc/include -D PC -D SCENARIO=0 -O3 decryption_key_schedule.c -I./../source -I./../../../common -I./../../../../../common/source/rotations -o ./../build/decryption_key_schedule.o
+gcc -c -g -fdata-sections -ffunction-sections -Wcast-align -Wsign-compare -Waggregate-return -Wunused -Wfatal-errors -Wl,--gc-sections -Wl,--relax -I../../../../../common/source/pc/include -D PC -D SCENARIO=0 -O3 MULT_constants.c -I./../source -I./../../../common -I./../../../../../common/source/rotations -o ./../build/MULT_constants.o
+gcc -c -g -fdata-sections -ffunction-sections -Wcast-align -Wsign-compare -Waggregate-return -Wunused -Wfatal-errors -Wl,--gc-sections -Wl,--relax -I../../../../../common/source/pc/include -D PC -D SCENARIO=0 -O3 SBOX_constants.c -I./../source -I./../../../common -I./../../../../../common/source/rotations -o ./../build/SBOX_constants.o
+gcc -c -g -fdata-sections -ffunction-sections -Wcast-align -Wsign-compare -Waggregate-return -Wunused -Wfatal-errors -Wl,--gc-sections -Wl,--relax -I../../../../../common/source/pc/include -D PC -D SCENARIO=0 -O3 encryption_key_schedule.c -I./../source -I./../../../common -I./../../../../../common/source/rotations -o ./../build/encryption_key_schedule.o
+gcc -c -g -fdata-sections -ffunction-sections -Wcast-align -Wsign-compare -Waggregate-return -Wunused -Wfatal-errors -Wl,--gc-sections -Wl,--relax -I../../../../../common/source/pc/include -D PC -D SCENARIO=0 -O3 decrypt.c -I./../source -I./../../../common -I./../../../../../common/source/rotations -o ./../build/decrypt.o
+gcc -c -g -fdata-sections -ffunction-sections -Wcast-align -Wsign-compare -Waggregate-return -Wunused -Wfatal-errors -Wl,--gc-sections -Wl,--relax -I../../../../../common/source/pc/include -D PC -D SCENARIO=0 -O3 ../../../common/main.c -I./../source -I./../../../common -I./../../../../../common/source/rotations -o ./../build/main.o
+gcc -c -g -fdata-sections -ffunction-sections -Wcast-align -Wsign-compare -Waggregate-return -Wunused -Wfatal-errors -Wl,--gc-sections -Wl,--relax -I../../../../../common/source/pc/include -D PC -D SCENARIO=0 -O3 ../../../common/common.c -I./../source -I./../../../common -I./../../../../../common/source/rotations -o ./../build/common.o
+gcc -g -fdata-sections -ffunction-sections -Wcast-align -Wsign-compare -Waggregate-return -Wunused -Wfatal-errors -Wl,--gc-sections -Wl,--relax -I../../../../../common/source/pc/include ./../build/test_vectors.o ./../build/encrypt.o ./../build/decryption_key_schedule.o ./../build/MULT_constants.o ./../build/SBOX_constants.o ./../build/encryption_key_schedule.o ./../build/decrypt.o \
+	./../build/main.o ./../build/common.o \
+	 -o ./../build/cipher.elf
+objdump -dSt ./../build/cipher.elf > ./../build/cipher.lst
+objdump -dSt ./../build/test_vectors.o > ./../build/test_vectors.lst
+objdump -dSt ./../build/encrypt.o > ./../build/encrypt.lst
+objdump -dSt ./../build/decryption_key_schedule.o > ./../build/decryption_key_schedule.lst
+objdump -dSt ./../build/MULT_constants.o > ./../build/MULT_constants.lst
+objdump -dSt ./../build/SBOX_constants.o > ./../build/SBOX_constants.lst
+objdump -dSt ./../build/encryption_key_schedule.o > ./../build/encryption_key_schedule.lst
+objdump -dSt ./../build/decrypt.o > ./../build/decrypt.lst
+objdump -dSt ./../build/main.o > ./../build/main.lst
+objdump -dSt ./../build/common.o > ./../build/common.lst
+---------- End building Lilliput_64_80_v01 ----------
+---------- Begin cleaning: Lilliput_64_80_v01 ----------
+rm -f *~
+rm -f ./../source/*~
+rm -f ./../../../common/*~
+rm -f ./../build/cipher.elf
+rm -f ./../build/cipher.bin
+rm -f ./../build/cipher.lst
+rm -f ./../build/scenario1.elf
+rm -f ./../build/scenario1.bin
+rm -f ./../build/scenario1.lst
+rm -f ./../build/scenario2.elf
+rm -f ./../build/scenario2.bin
+rm -f ./../build/scenario2.lst
+rm -f ./../build/main.o 
+rm -f ./../build/common.o
+rm -f ./../build/test_vectors.o ./../build/encrypt.o ./../build/decryption_key_schedule.o ./../build/MULT_constants.o ./../build/SBOX_constants.o ./../build/encryption_key_schedule.o ./../build/decrypt.o
+rm -f ./../build/encrypt_scenario1.o ./../build/decrypt_scenario1.o ./../build/scenario1.o
+rm -f ./../build/scenario2.o ./../build/encrypt_scenario2.o ./../build/round_keys.o ./../build/decrypt_scenario2.o
+rm -f ./../build/test_vectors.lst ./../build/encrypt.lst ./../build/decryption_key_schedule.lst ./../build/MULT_constants.lst ./../build/SBOX_constants.lst ./../build/encryption_key_schedule.lst ./../build/decrypt.lst ./../build/main.lst ./../build/common.lst
+rm -f ./../build/encrypt_scenario1.lst ./../build/decrypt_scenario1.lst
+rm -f ./../build/encrypt_scenario2.lst ./../build/round_keys.lst ./../build/decrypt_scenario2.lst
+rm -f ./../build/*.su
+rm -f ./../build/*.map
+---------- End cleaning: Lilliput_64_80_v01 ----------
+Building for PC ...
+Building with DEBUG flag set to 7 ...
+Building with SCENARIO flag set to 0 ...
+Building with MEASURE_CYCLE_COUNT flag NOT set ...
+Building with COMPILER_OPTIONS flag set to -O3 ...
+---------- Start building Lilliput_64_80_v01 ----------
+gcc -c -g -fdata-sections -ffunction-sections -Wcast-align -Wsign-compare -Waggregate-return -Wunused -Wfatal-errors -Wl,--gc-sections -Wl,--relax -I../../../../../common/source/pc/include -D PC -D DEBUG=7 -D SCENARIO=0 -O3 test_vectors.c -I./../source -I./../../../common -I./../../../../../common/source/rotations -o ./../build/test_vectors.o
+gcc -c -g -fdata-sections -ffunction-sections -Wcast-align -Wsign-compare -Waggregate-return -Wunused -Wfatal-errors -Wl,--gc-sections -Wl,--relax -I../../../../../common/source/pc/include -D PC -D DEBUG=7 -D SCENARIO=0 -O3 encrypt.c -I./../source -I./../../../common -I./../../../../../common/source/rotations -o ./../build/encrypt.o
+gcc -c -g -fdata-sections -ffunction-sections -Wcast-align -Wsign-compare -Waggregate-return -Wunused -Wfatal-errors -Wl,--gc-sections -Wl,--relax -I../../../../../common/source/pc/include -D PC -D DEBUG=7 -D SCENARIO=0 -O3 decryption_key_schedule.c -I./../source -I./../../../common -I./../../../../../common/source/rotations -o ./../build/decryption_key_schedule.o
+gcc -c -g -fdata-sections -ffunction-sections -Wcast-align -Wsign-compare -Waggregate-return -Wunused -Wfatal-errors -Wl,--gc-sections -Wl,--relax -I../../../../../common/source/pc/include -D PC -D DEBUG=7 -D SCENARIO=0 -O3 MULT_constants.c -I./../source -I./../../../common -I./../../../../../common/source/rotations -o ./../build/MULT_constants.o
+gcc -c -g -fdata-sections -ffunction-sections -Wcast-align -Wsign-compare -Waggregate-return -Wunused -Wfatal-errors -Wl,--gc-sections -Wl,--relax -I../../../../../common/source/pc/include -D PC -D DEBUG=7 -D SCENARIO=0 -O3 SBOX_constants.c -I./../source -I./../../../common -I./../../../../../common/source/rotations -o ./../build/SBOX_constants.o
+gcc -c -g -fdata-sections -ffunction-sections -Wcast-align -Wsign-compare -Waggregate-return -Wunused -Wfatal-errors -Wl,--gc-sections -Wl,--relax -I../../../../../common/source/pc/include -D PC -D DEBUG=7 -D SCENARIO=0 -O3 encryption_key_schedule.c -I./../source -I./../../../common -I./../../../../../common/source/rotations -o ./../build/encryption_key_schedule.o
+gcc -c -g -fdata-sections -ffunction-sections -Wcast-align -Wsign-compare -Waggregate-return -Wunused -Wfatal-errors -Wl,--gc-sections -Wl,--relax -I../../../../../common/source/pc/include -D PC -D DEBUG=7 -D SCENARIO=0 -O3 decrypt.c -I./../source -I./../../../common -I./../../../../../common/source/rotations -o ./../build/decrypt.o
+gcc -c -g -fdata-sections -ffunction-sections -Wcast-align -Wsign-compare -Waggregate-return -Wunused -Wfatal-errors -Wl,--gc-sections -Wl,--relax -I../../../../../common/source/pc/include -D PC -D DEBUG=7 -D SCENARIO=0 -O3 ../../../common/main.c -I./../source -I./../../../common -I./../../../../../common/source/rotations -o ./../build/main.o
+gcc -c -g -fdata-sections -ffunction-sections -Wcast-align -Wsign-compare -Waggregate-return -Wunused -Wfatal-errors -Wl,--gc-sections -Wl,--relax -I../../../../../common/source/pc/include -D PC -D DEBUG=7 -D SCENARIO=0 -O3 ../../../common/common.c -I./../source -I./../../../common -I./../../../../../common/source/rotations -o ./../build/common.o
+gcc -g -fdata-sections -ffunction-sections -Wcast-align -Wsign-compare -Waggregate-return -Wunused -Wfatal-errors -Wl,--gc-sections -Wl,--relax -I../../../../../common/source/pc/include ./../build/test_vectors.o ./../build/encrypt.o ./../build/decryption_key_schedule.o ./../build/MULT_constants.o ./../build/SBOX_constants.o ./../build/encryption_key_schedule.o ./../build/decrypt.o \
+	./../build/main.o ./../build/common.o \
+	 -o ./../build/cipher.elf
+objdump -dSt ./../build/cipher.elf > ./../build/cipher.lst
+objdump -dSt ./../build/test_vectors.o > ./../build/test_vectors.lst
+objdump -dSt ./../build/encrypt.o > ./../build/encrypt.lst
+objdump -dSt ./../build/decryption_key_schedule.o > ./../build/decryption_key_schedule.lst
+objdump -dSt ./../build/MULT_constants.o > ./../build/MULT_constants.lst
+objdump -dSt ./../build/SBOX_constants.o > ./../build/SBOX_constants.lst
+objdump -dSt ./../build/encryption_key_schedule.o > ./../build/encryption_key_schedule.lst
+objdump -dSt ./../build/decrypt.o > ./../build/decrypt.lst
+objdump -dSt ./../build/main.o > ./../build/main.lst
+objdump -dSt ./../build/common.o > ./../build/common.lst
+---------- End building Lilliput_64_80_v01 ----------

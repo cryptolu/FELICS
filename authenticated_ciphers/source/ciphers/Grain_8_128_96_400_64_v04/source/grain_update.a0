@@ -1,0 +1,370 @@
+/*
+   Copyright : 2019 (C) Design team of Grain128-AEAD
+   License   : We grant a free license to use and modify the code by anyone and in any way, for any purpose
+   Cipher    : Grain128-AEAD for FELICS-AEAD framework
+   Target    : 16-bit MSP430F1611, Fast speed code (C+ASM)
+   Author    : Alexander Maximov
+   Date      : 2019-11-25
+ */
+
+#include "grain_common.h"
+
+#if !defined(IS_MSP)
+#if (defined(MSP)||defined(__MSP__))
+#define IS_MSP 1
+#else
+#define IS_MSP 0
+#endif
+#endif
+
+
+#if IS_MSP == 0
+
+// shift right by 8
+#define get8(B, A, R)\
+	R = A & 0xff00;\
+	R |= B & 0x00ff;\
+	R = (R>>8)|(R<<8);
+
+#define shr2(t1, t0)\
+	t0 = (t0>>1)|(t1<<15);\
+	t1 = (t1>>1);
+
+#define shr7(t6, t5, t4, t3, t2, t1, t0)\
+	t0 = (t0>>1)|(t1<<15);\
+	t1 = (t1>>1)|(t2<<15);\
+	t2 = (t2>>1)|(t3<<15);\
+	t3 = (t3>>1)|(t4<<15);\
+	t4 = (t4>>1)|(t5<<15);\
+	t5 = (t5>>1)|(t6<<15);\
+	t6 = (t6>>1);
+
+#define shl7(t6, t5, t4, t3, t2, t1, t0)\
+	t6 = (t6<<1)|(t5>>15); \
+	t5 = (t5<<1)|(t4>>15); \
+	t4 = (t4<<1)|(t3>>15); \
+	t3 = (t3<<1)|(t2>>15); \
+	t2 = (t2<<1)|(t1>>15); \
+	t1 = (t1<<1)|(t0>>15); \
+	t0 = (t0<<1);
+
+
+#define shl6(t5, t4, t3, t2, t1, t0)\
+	t5 = (t5<<1)|(t4>>15); \
+	t4 = (t4<<1)|(t3>>15); \
+	t3 = (t3<<1)|(t2>>15); \
+	t2 = (t2<<1)|(t1>>15); \
+	t1 = (t1<<1)|(t0>>15); \
+	t0 = (t0<<1);
+
+#define shl4(t3, t2, t1, t0)\
+	t3 = (t3<<1)|(t2>>15); \
+	t2 = (t2<<1)|(t1>>15); \
+	t1 = (t1<<1)|(t0>>15); \
+	t0 = (t0<<1);
+
+#define shl2(t1, t0)\
+	t1 = (t1<<1)|(t0>>15); \
+	t0 = (t0<<1);
+
+
+#define mov(a, b)	a = b;
+#define xor(a, b)	a^=b;
+#define and(a, b)	a&=b;
+
+uint16_t stack[5], stack_ptr = 0;
+
+#define push(x) stack[stack_ptr++] = x;
+#define pop(x) x = stack[--stack_ptr];
+
+#define LF0		g->lfsr[0]
+#define LF1		g->lfsr[1]
+#define LF2		g->lfsr[2]
+#define LF3		g->lfsr[3]
+#define LF4		g->lfsr[4]
+#define LF5		g->lfsr[5]
+#define LF6		g->lfsr[6]
+#define LF7		g->lfsr[7]
+
+#define NF0		g->nfsr[0]
+#define NF1		g->nfsr[1]
+#define NF2		g->nfsr[2]
+#define NF3		g->nfsr[3]
+#define NF4		g->nfsr[4]
+#define NF5		g->nfsr[5]
+#define NF6		g->nfsr[6]
+#define NF7		g->nfsr[7]
+
+#else
+
+// shift right by 8
+#define get8(B, A, R)				\
+		"mov.b	" A " , " R "  \n\t"\
+		"xor.b	" B " , " R "  \n\t"\
+		"xor	" A " , " R "  \n\t"\
+		"swpb	" R "  \n\t"
+
+#define shr2(T1, T0)			\
+		"rrc	" T1 " 	\n\t"	\
+		"rrc	" T0 " 	\n\t"
+
+#define shr7(T6, T5, T4, T3, T2, T1, T0)\
+		"rrc	" T6 " 	\n\t"	\
+		"rrc	" T5 " 	\n\t"	\
+		"rrc	" T4 " 	\n\t"	\
+		"rrc	" T3 " 	\n\t"	\
+		"rrc	" T2 " 	\n\t"	\
+		"rrc	" T1 " 	\n\t"	\
+		"rrc	" T0 " 	\n\t"
+
+#define shl2(T1, T0)			\
+		"rlc	" T0 " 	\n\t"	\
+		"rlc	" T1 " 	\n\t"
+
+#define shl4(T3, T2, T1, T0)	\
+		"rlc	" T0 " 	\n\t"	\
+		"rlc	" T1 " 	\n\t"	\
+		"rlc	" T2 " 	\n\t"	\
+		"rlc	" T3 " 	\n\t"
+
+#define shl6(T5, T4, T3, T2, T1, T0)	\
+		"rlc	" T0 " 	\n\t"	\
+		"rlc	" T1 " 	\n\t"	\
+		"rlc	" T2 " 	\n\t"	\
+		"rlc	" T3 " 	\n\t"	\
+		"rlc	" T4 " 	\n\t"	\
+		"rlc	" T5 " 	\n\t"
+
+#define shl7(T6, T5, T4, T3, T2, T1, T0)	\
+		"rlc	" T0 " 	\n\t"	\
+		"rlc	" T1 " 	\n\t"	\
+		"rlc	" T2 " 	\n\t"	\
+		"rlc	" T3 " 	\n\t"	\
+		"rlc	" T4 " 	\n\t"	\
+		"rlc	" T5 " 	\n\t"	\
+		"rlc	" T6 " 	\n\t"
+
+#define PTR(i) #i "(%11)"
+
+#define LF0	PTR(0)
+#define LF1	PTR(2)
+#define LF2	PTR(4)
+#define LF3	PTR(6)
+#define LF4	PTR(8)
+#define LF5	PTR(10)
+#define LF6	PTR(12)
+#define LF7	PTR(14)
+
+#define NF0	PTR(16)
+#define NF1	PTR(18)
+#define NF2	PTR(20)
+#define NF3	PTR(22)
+#define NF4	PTR(24)
+#define NF5	PTR(26)
+#define NF6	PTR(28)
+#define NF7	PTR(30)
+
+
+#define mov(A, B)	"mov " B " , " A "  \n\t" 
+#define xor(A, B)	"xor " B " , " A "  \n\t" 
+#define and(A, B)	"and " B " , " A "  \n\t" 
+
+#define push(A) "push " A "  \n\t"
+#define pop(A)  "pop " A "  \n\t"
+
+#endif
+
+
+
+uint16_t grain_update(GrainState * g)
+{	
+	uint16_t t0, t1, t2, t3, t4, t5, t6;
+	uint16_t a, b, c, d;
+
+#if IS_MSP == 1
+#define t0	"%0"
+#define t1	"%1"
+#define t2	"%2"
+#define t3	"%3"
+#define t4	"%4"
+#define t5	"%5"
+#define t6	"%6"
+
+#define a	"%7"
+#define b	"%8"
+#define c	"%9"
+#define d	"%10"
+
+__asm__ __volatile__(
+#endif
+
+	mov(t0, LF0)
+	mov(t1, LF1)
+	mov(t2, LF2)
+	mov(t3, LF3)
+	mov(t4, LF4)
+	mov(t5, LF5)
+	mov(t6, LF6)
+	mov(LF0, t1)
+	mov(LF1, t2)
+	mov(LF2, t3)
+	mov(LF3, t4)
+	mov(LF4, t5)
+	mov(LF5, t6)
+	mov(LF6, LF7)
+	mov(a, t0) 
+	xor(a, t6)
+	push(t0)
+	get8(t1, t0, c)
+	push(c)
+	mov(d, t6)
+	mov(c, t5)
+	shr2(d, c)
+	xor(a, c)
+	shl7(t6, t5, t4, t3, t2, t1, t0)
+	get8(t1, t0, c)
+	xor(a, c)
+	mov(c, t5)
+	shl7(t6, t5, t4, t3, t2, t1, t0)
+	get8(t3, t2, d)
+	xor(a, d)
+	get8(t5, t4, d)
+	xor(a, d)
+	mov(d, t6)
+	mov(LF7, a)
+	shl7(t6, t5, t4, t3, t2, t1, t0)
+	mov(b, t1)
+	mov(a, t6)
+	shl4(t4, t3, t2, t1)
+	and(c, t4)
+	xor(a, c)
+	get8(t2, t1, t5)
+	and(b, t5)
+	xor(a, b)
+	shl2(t3, t2)
+	shl2(t3, t2)
+	mov(t0, NF0) 
+	mov(t1, NF1)
+	mov(t5, NF5)
+	mov(t6, NF6)
+	push(t0)
+	shl4(t6, t5, t1, t0)
+	mov(c, t6)
+	and(t3, t6)
+	xor(a, t3)
+	and(d, t6)
+	shl4(t6, t5, t1, t0)
+	shl4(t6, t5, t1, t0)
+	and(c, t6)
+	shl4(t6, t5, t1, t0)
+	and(c, t6)
+	and(d, t1)
+	xor(a, d)
+	pop(t0)
+	pop(d)
+	and(d, t1)
+	xor(a, d)
+	shl2(t6, t5)
+	mov(d, t6)
+	shl2(t6, t5)
+	shl2(t6, t5)
+	xor(a, t6)
+	shl2(t6, t5)
+	and(c, t6)
+	xor(c, d)
+	pop(b)
+	xor(b, c)
+	mov(t1, NF1)
+	mov(t2, NF2)
+	mov(t3, NF3)
+	mov(t4, NF4)
+	mov(t5, NF5)
+	mov(t6, NF6)
+	mov(NF0, t1)
+	mov(NF1, t2)
+	mov(NF2, t3)
+	mov(NF3, t4)
+	mov(NF4, t5)
+	mov(NF5, t6)
+	mov(NF6, NF7)
+	xor(a, t4)
+	xor(b, t0)
+	xor(b, t6)
+	get8(t3, t2, c)
+	and(c, t3)
+	xor(b, c)
+	get8(t4, t3, c)
+	xor(b, c)
+	get8(t2, t1, c)
+	shr7(t6, t5, t4, t3, t2, t1, t0)
+	get8(t2, t1, d)
+	and(c, d)
+	push(c)
+	get8(t5, t4, d)
+	xor(a, d)
+	mov(d, t1)
+	mov(c, t4)
+	shr7(t6, t5, t4, t3, t2, t1, t0)
+	xor(a, t0)
+	and(d, t1)
+	xor(b, d)
+	get8(t2, t1, d)
+	xor(b, d)
+	push(t5)
+	shr7(t6, t5, t4, t3, t2, t1, t0)
+	push(c)
+	mov(c, t0)
+	and(c, t4)
+	xor(b, c)
+	get8(t2, t1, c)
+	get8(t4, t3, d)
+	and(c, d)
+	xor(b, c)
+	get8(t1, t0, c)
+	shr7(t6, t5, t4, t3, t2, t1, t0)
+	xor(a, t2)
+	mov(d, t4)
+	and(d, t5)
+	xor(b, d)
+	shr7(t6, t5, t4, t3, t2, t1, t0)
+	get8(t3, t2, d)
+	xor(a, d)
+	get8(t1, t0, d)
+	and(c, d)
+	xor(b, c)
+	get8(t4, t3, d)
+	pop(c)
+	and(c, d)
+	xor(b, c)
+	shr7(t6, t5, t4, t3, t2, t1, t0)
+	pop(d)
+	get8(t5, t4, c)
+	and(c, t4)
+	and(c, d)
+	xor(b, c)
+	pop(d)
+	and(d, t1)
+	xor(b, d)
+	mov(NF7, b)
+	shr2(t1, t0)
+	get8(t1, t0, c)
+	xor(a, c)
+
+#if IS_MSP == 1
+#undef t0
+#undef t1
+#undef t2
+#undef t3
+#undef t4
+#undef t5
+#undef t6
+#undef a
+#undef b
+#undef c
+#undef d
+
+	: "=r" (t0), "=r" (t1), "=r" (t2), "=r" (t3), "=r" (t4), "=r" (t5), "=r" (t6), "=r" (a), "=r" (b), "=r" (c), "=r" (d), "+r" (g)
+	);
+#endif
+	return a;
+}

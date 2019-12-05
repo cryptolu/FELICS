@@ -1,0 +1,26 @@
+ImplementationDescription: Schwaemm 192 192
+ImplementationAuthors: Luan Cardoso dos Santos
+
+InitializationConstants:
+ProcessAssociatedDataConstants:
+ProcessPlaintextConstants:
+FinalizationConstants:
+TagGenerationConstants:
+ProcessCiphertextConstants:
+
+InitializationCode: initialize.c
+ProcessAssociatedDataCode:  process_associated_data.c
+ProcessPlaintextCode: process_plaintext.c
+FinalizationCode: finalize.c
+TagGenerationCode: tag_generation.c
+ProcessCiphertextCode: process_ciphertext.c
+
+UseFinalization: yes
+
+ProcessEmptyAssociatedData: yes
+ProcessEmptyMessage: yes
+
+ImplementationAVR: C
+ImplementationMSP: C
+ImplementationARM: C
+ImplementationPC: C

@@ -1,0 +1,117 @@
+/*
+   Copyright : 2019 (C) Design team of Grain128-AEAD
+   License   : We grant a free license to use and modify the code by anyone and in any way, for any purpose
+   Cipher    : Grain128-AEAD for FELICS-AEAD framework
+   Target    : 16-bit MSP430F1611, Fast speed code (C+ASM)
+   Author    : Alexander Maximov
+   Date      : 2019-11-25
+ */
+
+#include "grain_common.h"
+
+uint16_t grain_update(GrainState * g)
+{	
+#define LF(i) (*(uint32_t*)((uint8_t*)g->lfsr + i))
+#define NF(i) (*(uint32_t*)((uint8_t*)g->nfsr + i))
+
+	uint32_t t0, t1, t2, t3;
+	uint16_t nn, y, ln;
+	
+	t0 = LF(0)>>1;
+	t0 ^= LF(4);
+	t0 ^= LF(8);
+	t0 >>= 5;
+	t0 ^= LF(10);
+	t0 >>= 1;
+	ln = g->lfsr[0];
+	ln ^= t0;
+	ln ^= g->lfsr[6];
+	t1 = NF(11)>>1;
+	t0 = NF(1)>>2;
+	t3 = t0; // store NF(1)>>2;
+	t0 ^= LF(11);
+	t0 ^= NF(5);
+	t0 >>=1;
+	t0 ^= NF(4);
+	t2 = LF(1);
+	t2 >>=1;
+	t2 &= LF(2);
+	t0 ^= t2;
+	t2 = LF(9)>>3;
+	t2 &= LF(7);
+	t0 ^= t2;
+	t2 = t1;
+	t2 &= LF(11);
+	t2 >>=2;
+	t2 &= NF(1);
+	t0 ^= t2;
+	t0>>=2;
+	y = t1;
+	t1 >>= 1;
+	t2 = t1;
+	t2 &= NF(11);
+	t2 >>= 1;
+	t2 &= NF(11);
+	t2 >>=4;
+	nn = (uint16_t)t2;
+	nn &= (uint16_t)NF(11);
+	t1 >>= 1;
+	nn ^= t1;
+	t2 = t1;
+	t2>>=2;
+	t2 &= LF(5);
+	t2 ^= t0;
+	t2 ^= NF(0);
+	t2>>=1;
+	t2 ^= NF(9);
+	t2>>=1;
+	y ^= (uint16_t)t2;
+	y ^= g->nfsr[4];
+	t2 = t3;
+	t2>>=2;
+	y ^= (uint16_t)t2 & (uint16_t)LF(1);
+	nn ^= g->lfsr[0] ^ g->nfsr[0] ^ g->nfsr[6] ^ (g->nfsr[3] & (uint16_t)NF(5)) ^ (uint16_t)NF(7);
+	t2 = NF(3);
+	t2 >>=2;
+	nn ^= (uint16_t)t2;
+	t0 = NF(2);
+	t0>>=1;
+	t2 = t0;
+	t0 &= NF(2);
+	t2>>=4;
+	t2 &= NF(3);
+	t2>>=1;
+	t2 &= NF(3);
+	nn ^= (uint16_t)t2;
+	t2 = NF(8);
+	t2 &= NF(10);
+	t2 >>= 1;
+	t1 = NF(0);
+	t1 &= NF(8);
+	t2 ^= t1;
+	t3 &= NF(1);
+	t2 ^= t3;
+	t1 = NF(3);
+	t1 &= NF(7);
+	t2 ^= t1;
+	t2 >>= 1;
+	t1 = NF(8);
+	t1 &= NF(9);
+	t1 >>= 4;
+	t1 &= NF(10);
+	t2 ^= t1;
+	t2>>=1;
+	t1 = NF(7);
+	t1>>=4;
+	t1&=NF(8);
+	t2 ^= t1;
+	t2 ^= t0;
+	t2 >>= 1;
+	nn ^= (uint16_t)t2;
+
+	memcpy(g->lfsr, g->lfsr + 1, 30);
+	g->lfsr[7] = ln;
+	g->nfsr[7] = nn;
+	return y;
+}
+

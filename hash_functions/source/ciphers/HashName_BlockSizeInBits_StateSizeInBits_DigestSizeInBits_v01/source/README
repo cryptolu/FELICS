@@ -1,0 +1,401 @@
+Initial file structure
+======================
+
+.									 -> HashName_BlockSizeInBits_StateSizeInBits_DigestSizeInBits_v01
+├── build							 -> Hash build directory
+└── source                           -> Hash source directory
+    ├── implementation.info          -> Hash implementation information
+    ├── constants.h                  -> Hash constants declaration
+    ├── data_types.h                 -> Hash data types
+    ├── initialize.c                 -> Hash state initialization
+    ├── update.c                     -> Hash state update
+    ├── finalize.c                   -> Hash state finalization 
+    ├── Makefile                     -> Makefile
+    ├── README                       -> README file
+    └── test_vectors.c               -> Hash test vectors
+
+
+Add cipher implementation
+=========================
+
+Steps:
+    1. Make a copy of "HashName_BlockSizeInBits_StateSizeInBits_DigestSizeInBits_v01" directory 
+       in "ciphers" directory.
+
+    2. Rename the copy of the directory to follow the pattern 
+       "HashName_BlockSizeInBits_StateSizeInBits_DigestSizeInBits_v01".
+            Example: "GIMLI_128_384_128_v01"
+        Note: If you add several implementation for the same hash (for example
+        one optimized for RAM and one optimized for speed) you can increase the 
+        hash directory name suffix "_v02", "_v03", etc.
+            Example: "GIMLI_128_384_128_v02"
+
+    3. Add hash implementation:
+        a. Add hash block size, state size and digest size in "constants.h".
+
+        b. If needed add macros to "constants.h" that calculate CAPACITY,
+           ADBLOCK_NUM, PTBLOCK_NUM, LAST_BLOCK_SIZE
+        
+        c. Declare cipher IV, keys and other constants in "constants.h" and 
+           define them in "constants.c" or in any other "*.c" file, except "*.c" files 
+           from Section 3.d.
+        
+        d. Mention if the hash round function construction is of SPONGE mode or not. e.g.
+            if it is a sponge construction, mention in constants.h as follows:
+                #define SPONGE TRUE
+            otherwise mention:
+                #define SPONGE FALSE
+
+        Note: You can use any data type based on "RAM_DATA_*" 
+              ("RAM_DATA_BYTE", "RAM_DATA_WORD", "RAM_DATA_DOUBLE_WORD") or "ROM_DATA_*" 
+              ("ROM_DATA_BYTE", "ROM_DATA_WORD", "ROM_DATA_DOUBLE_WORD") depending where you 
+              want to store them.
+
+        Note: If you want to define your custom data types in different 
+              scenarios for different architectures use "data_types.h" file.
+                Example:
+                  in "data_types.h"
+                      #define SBOX1_BYTE ROM_DATA_BYTE
+                      #define READ_SBOX1_BYTE READ_ROM_DATA_BYTE
+                      #define SBOX2_WORD RAM_DATA_WORD
+                      #define READ_SBOX2_WORD READ_RAM_DATA_WORD
+                  in "constants.h"
+                      extern SBOX1_BYTE SBox1[4];
+                      extern SBOX2_WORD SBox2[2];
+                      extern RAM_DATA_DOUBLE_WORD SBox[1];
+                  in "constants.c"
+                      SBOX1_BYTE SBox1[4] = { 0x01, 0x02, 0x03, 0x04 };
+                      SBOX2_WORD SBox2[2] = { 0x0201, 0x0403 };
+                      RAM_DATA_DOUBLE_WORD SBox[1] = { 0x04030201 };
+
+        e. If you have constants used by one or more of the following operations
+           (initialize, update, finalize), you can define them in separate "*.c" 
+           files and declare them in "constants.h" file according with the following rules:
+
+            * Do not use the following names for the added "*.c" files:
+                "main"
+                "cipher"
+                "common"
+                "test_vectors"
+                "initialize"
+                "update"
+                "finalize"
+
+            * Do not add constant definition in "*.h" files, except for macros. 
+              Declare the constants in "constants.h" file and define them in "*.c" files.
+
+            * Add the "*.c" name withouth the "." separator and extension in
+              "implementation.info" file, in the corresponding section(s) 
+              ("UpdateConstants:", "InitializeConstants:", etc.). 
+              If a section contains more than one file, use ", " as separator.
+
+            Example:
+                - if you add the following "*.c" constant files:
+                    "f.c" that contains common constants for finalization and initialization
+                    "g.c" that contains common constants for intialization and update
+                    "h.c" that contains constants for update
+
+                    - the "implementation.info" file should contain:
+                        InitializationConstants: f, g
+                        UpdateConstants: h, g
+                        FinalizationConstants: f
+            Note: Do not add constants definitions in files that contain cipher implementation 
+                  ("initialize.c","update.c", "finalize.c").
+
+        d. Declare & define the cipher test vectors in "test_vectors.c"
+            They should include vectors with input size = BLOCK_SIZE and vectors with input size < BLOCK_SIZE.
+            Latter is for testing if padding implementation working
+
+        e. Implement the initialization in "initialization.c" using the following function signature:
+            void Initialize(uint8_t *state);
+
+        f. Update the hash state using input message in "update.c" using the following function signature:
+            void Update(uint8_t *state, uint8_t *message, uint16_t message_len);
+        
+        Notes:
+            1. message here is always of BLOCK_SIZE.
+            2. Here message_len is the length of message that is not yet processed. e.g. If total message lenth 
+               is 37 bytes and block length is 8 bytes, message length in subsequent calsl of Update() should be
+               37, 29, 21, 13 and 5. This is for Update() function to identify position of the block being processed.
+
+
+        g. Implement the finalization in "finalize.c" using the following function signature:
+            void Finalize(uint8_t *state, uint8_t *digest)
+
+        Notes for sections 3.{e, f, g}
+            1:  To read data types based on "RAM_DATA_*" 
+            ("RAM_DATA_BYTE", "RAM_DATA_WORD", "RAM_DATA_DOUBLE_WORD") or "ROM_DATA_*" 
+            ("ROM_DATA_BYTE", "ROM_DATA_WORD", "ROM_DATA_DOUBLE_WORD") macros use the 
+            associated macros.
+            Example:
+                uint8_t SBox1Value = READ_SBOX1_DATA_BYTE(SBox1[0]);
+                uint16_t SBox2Value = READ_SBOX2_DATA_WORD(SBox2[0]);
+                uint32_t SBoxValue = READ_RAM_DATA_DOUBLE_WORD(SBox[0]);
+            2.  Note: Do not add constants definitions in files that contain cipher 
+            implementation ("initialize.c","update.c", "finalize.c" and so on).
+
+        h. Add a description of your implementation in "implementation.info" 
+file, in the "ImplementationDescription:" section.
+            Example:
+                ImplementationDescription: GIMLI reference C implementation
+
+        i.  If you have common functions used by two or more of the following 
+            operations (initialize, update, finalize), you can add them in separate 
+            "*.c" and "*.h" files according with the following rules. The same rules 
+            apply when you just want to make the code cleaner by implementing some functions in separate files.
+
+            *   Do not use the following names for the added "*.c" and/or "*.h" files:
+                "main"
+                "cipher"
+                "common"
+                "test_vectors"
+                "initialize"
+                "update"
+                "finalize"
+
+            *   Do not add constant definition in "*.h" files, except for macros.
+                For constants either use "constants.c" and "constants.h" (See 3.c.), either use 
+                your own "*.c" and "*.h" files, but declare the constants in "*.h" files and 
+                define them in "*.c" files.
+
+            *   Add the "*.c" name withouth the "." separator and extension in
+                "implementation.info" file, in the corresponding section(s) 
+                ("InitializationCode:", "UpdateDataCode:", "FinalizationCode:"). 
+                If a section contains more than one file, use ", " as separator.
+
+            Example:
+                - if you add the following files:
+					"f.c" that contains common code parts for initialize and finalize
+					"g.c" that contains common code parts for update and finalize
+					"h.c" that contains a part of the initialize and update
+
+				- the "implementation.info" file should contain:
+                    InitializationCode: f, h
+                    UpdateCode: g, h
+                    FinalizationCode: f, g
+
+        j.  Indicate if the implementation uses/does not use initialization and finalization. e.g.
+            If the hash does not use initialization and Initialize() function is empty and Finalize()
+            function is not empty then in implementation.info mention as follows:
+                UseInitializarion: no
+                UseFinalization: yes
+
+        k. Indicate the implementation language for all supported platforms in "implementation.info" file.
+            Example:
+                ImplementationAVR: ASM
+                ImplementationMSP: C
+                ImplementationARM: ASM
+                ImplementationPC: 
+            Note: You don't have to set the implementation language to "C" because this is the default value.
+
+    4. Fill the cipher implementation authors in "implementation.info"
+        Example:
+            ImplementationAuthors: Bruce Wayne
+
+
+Coding rules
+============
+
+1. Do not use the following data types: int, char, short, long and the 
+combinations of them. Instead use: int8_t, uint8_t, int16_t, uint16_t, int32_t, 
+uint32_t, int64_t and uint64_t data types which are declared in "<stdint.h>".
+
+2. Try to keep the code clean and easy to read.
+
+3. Use the "/* ... */" comment style, unless you comment a set of test vectors, 
+in which case is indicated to use "// ...".
+
+4. The framework is designed with several debug and test cases, so you should 
+not add "printf" or other function calls in your code, at least not in the final 
+version.
+
+
+Using the makefile
+==================
+
+The makefile can build the cipher in different scenarios and test cases, 
+either in debug or in release mode. To see a list of the makefile options, just 
+type "make" or "make help" in the cipher "source" directory. You can also type 
+"make -f ./../source/Makefile" or "make -f ./../source/Makefile help" from 
+either cipher "source" directory or cipher "build" directory. For simplicity we 
+assume that you call the makefile from the cipher "source" directory.
+
+
+Debug mode
+    Build  & test cipher in debug mode for PC
+        make clean
+        make cipher
+        make test-cipher
+
+    Build & test scenario 1A in debug mode for PC
+        make clean
+        make scenario1A
+        make test-scenario1A
+
+    Build & test scenario 1B in debug mode for PC
+        make clean
+        make scenario1B
+        make test-scenario1B
+
+    Build & test scenario 1C in debug mode for PC
+        make clean
+        make scenario1C
+        make test-scenario1C
+
+    Build & test scenario 2 in debug mode for PC
+        make clean
+        make scenario2
+        make test-scenario2
+
+
+Release mode
+    Build cipher in release mode for PC
+        make clean
+        make pc
+
+    Build cipher in release mode for AVR
+        make clean
+        make avr
+
+    Build cipher in release mode for MSP
+        make clean
+        make msp
+
+    Build cipher in release mode for ARM
+        make clean
+        make arm
+
+    Build scenario 1A in release mode for PC
+        make clean
+        make pc-scenario1A
+
+    Build scenario 1B in release mode for PC
+        make clean
+        make pc-scenario1B
+
+    Build scenario 1C in release mode for PC
+        make clean
+        make pc-scenario1C
+
+    Build scenario 1A in release mode for AVR
+        make clean
+        make avr-scenario1A
+
+    Build scenario 1B in release mode for AVR
+        make clean
+        make avr-scenario1B
+
+    Build scenario 1C in release mode for AVR
+        make clean
+        make avr-scenario1C
+
+    Build scenario 1A in release mode for MSP
+        make clean
+        make msp-scenario1A
+
+    Build scenario 1B in release mode for MSP
+        make clean
+        make msp-scenario1B
+
+    Build scenario 1C in release mode for MSP
+        make clean
+        make msp-scenario1C
+
+    Build scenario 1A in release mode for ARM
+        make clean
+        make arm-scenario1A
+
+    Build scenario 1B in release mode for ARM
+        make clean
+        make arm-scenario1B
+
+    Build scenario 1C in release mode for ARM
+        make clean
+        make arm-scenario1C
+
+    Build scenario 2 in release mode for PC
+        make clean
+        make pc-scenario2
+
+    Build scenario 2 in release mode for AVR
+        make clean
+        make avr-scenario2
+
+    Build scenario 2 in release mode for MSP
+        make clean
+        make msp-scenario2
+
+    Build scenario 2 in release mode for ARM
+        make clean
+        make arm-scenario2
+
+If your cipher builds without errors or warnings and the five tests 
+(test-cipher, test-scenario1, test-scenario2, test-scenario3 and test-scenario4) run as expected, then the cipher 
+implementation is correctly integrated into the framework.
+
+Note: If you encounter warnings during the build, you should fix the code such 
+that they do not appear.
+
+
+Constraints
+===========
+
+1. BLOCK_SIZE in bits should be a multiple of 8.
+
+2. DIGEST_SIZE >= 128 bits/16 bytes
+
+3. For the hash functions with non-SPONGE mode rounds, BLOCK_SIZE > DIGEST_SIZE
+
+Getting the cipher metrics
+==========================
+
+1. Code Size
+From the cipher build directory type one of the following commands to see how to 
+use the cipher code size script:
+    ./../../../../scripts/cipher/cipher_code_size.sh -h
+    ./../../../../scripts/cipher/cipher_code_size.sh --help
+
+To get the code size in table format for a cipher for AVR in scenario 2 type:
+    ./../../../../scripts/cipher/cipher_code_size.sh -a=AVR -s=2
+
+To get the code size in raw format for a cipher for AVR in scenario 2 type:
+    ./../../../../scripts/cipher/cipher_code_size.sh -a=AVR -s=2 -m=1
+
+
+2. RAM
+From the cipher build directory type one of the following commands to see how to 
+use the cipher RAM script:
+    ./../../../../scripts/cipher/cipher_ram.sh -h 
+    ./../../../../scripts/cipher/cipher_ram.sh --help
+
+To get the RAM in table format for a cipher for AVR in scenario 2 type:
+    ./../../../../scripts/cipher/cipher_ram.sh -a=AVR -s=2
+
+To get the RAM in raw format for a cipher for AVR in scenario 2 type:
+    ./../../../../scripts/cipher/cipher_ram.sh -a=AVR -s=2 -m=1
+
+
+3. Execution Time
+From the cipher build directory type one of the following commands to see how to 
+use the cipher execution time script:
+    ./../../../../scripts/cipher/cipher_execution_time.sh -h 
+    ./../../../../scripts/cipher/cipher_execution_time.sh --help
+
+To get the execution time in table format for a cipher for AVR in scenario 2 
+type:
+    ./../../../../scripts/cipher/cipher_execution_time.sh -a=AVR -s=2
+
+To get the execution time in raw format for a cipher for AVR in scenario 2 type:
+    ./../../../../scripts/cipher/cipher_execution_time.sh -a=AVR -s=2 -m=1
+
+
+4. Collect all metrics
+To get help about how to collect all metrics for a list of ciphers on a list of 
+architectures in a list of scenarios use:
+    ./../../../../scripts/collect_ciphers_metrics.sh -h
+    ./../../../../scripts/collect_ciphers_metrics.sh -help
+
+To get all metrics for "LBlock_64_80_v01" and "LBlock_64_80_v03" on "PC" and 
+"ARM" in scenarios "1" and "2" in raw format use:
+    ./../../../../scripts/collect_ciphers_metrics.sh -a='PC ARM' -s='1 2' 
+-c='LBlock_64_80_v01 LBlock_64_80_v02' -f=1

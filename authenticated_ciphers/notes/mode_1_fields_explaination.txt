@@ -1,0 +1,54 @@
+Below described are the fields are displayed when mode=1 is used while calculating various metrics.
+
+1. code for "mode"=1 for cipher code size:
+   (left --> right corresponds to top --> bottom)
+
+    code size for initialize.c
+    code size for process_associated_data.c
+    code size for process_plaintext.c
+    code size for finalization.c
+    code size for tag_generation.c
+    code size for process_ciphertext.c
+    code size for tag_verification.c
+    code size of all the files combined
+
+2. code for "mode"=1 for cipher Execution time:
+   (left --> right corresponds to top --> bottom)
+
+    Execution time of Initialize() function
+    Execution time of ProcessAssociatedData() function
+    Execution time of ProcessPlaintext() function
+    Execution time of Finalize() function
+    Execution time of ProcessTagGeneration() function
+    Execution time of ProcessCiphertext() function
+    Execution time of ProcessTagVerification() function
+
+
+3. code for "mode"=1 for cipher RAM size:
+   (left --> right corresponds to top --> bottom)
+
+    RAM usage for Initialize() function
+    RAM usage for ProcessAssociatedData() function
+    RAM usage for ProcessPlaintext() function
+    RAM usage for Finalize() function
+    RAM usage for ProcessTagGeneration() function
+    RAM usage for ProcessCiphertext() function
+    RAM usage for ProcessTagVerification() function
+
+Following values are borrowed from current Block_Cipher module of FELICS. They represent the RAM
+usage by shared costants that are defined in separate files and used by one or more of core
+functions*
+
+    RAM usage by constants in Initialize() function
+    RAM usage by constants in ProcessAssociatedData() function
+    RAM usage by constants in ProcessPlaintext() function
+    RAM usage by constants in Finalize() function
+    RAM usage by constants in ProcessTagGeneration() function
+    RAM usage by constants in ProcessCiphertext() function
+    RAM usage by constants in ProcessTagVerification() function
+
+    RAM usage for Initialize() function
+    RAM usage for Initialize() function
+
+*  I am not very sure about how is this part of RAM usage calculated
+** I have to split the current $data_ram_tgv in two variables viz. $data_ram_tg and $data_ram_tv

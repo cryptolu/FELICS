@@ -1,0 +1,18 @@
+ImplementationDescription: This is an identity hash for GIMLI hash funciton
+ImplementationAuthors: Virat Shejwalkar
+
+InitializationConstants:
+UpdateConstants:
+FinalizationConstants:
+
+InitializationCode:
+UpdateCode:
+FinalizationCode:
+
+UseFinalization: no
+UseInitialization: no
+
+ImplementationAVR: C
+ImplementationMSP: C
+ImplementationARM: C
+ImplementationPC: C

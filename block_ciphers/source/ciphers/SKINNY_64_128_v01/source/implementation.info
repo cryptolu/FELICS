@@ -1,0 +1,20 @@
+ImplementationDescription: Skinny 64-128
+ImplementationAuthors:
+
+EncryptionKeyScheduleConstants: constants
+EncryptConstants: constants
+DecryptionKeyScheduleConstants:
+DecryptConstants: constants
+
+EncryptionKeyScheduleCode: skinny_reference
+EncryptCode: skinny_reference
+DecryptionKeyScheduleCode:
+DecryptCode: skinny_reference
+
+UseEncryptionKeySchedule: yes
+UseDecryptionKeySchedule: yes
+
+ImplementationAVR:
+ImplementationMSP:
+ImplementationARM:
+ImplementationPC: C

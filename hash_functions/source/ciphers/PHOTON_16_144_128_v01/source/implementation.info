@@ -1,0 +1,19 @@
+ImplementationDescription: This is PHOTON_128 implementation 
+ImplementationAuthors: Jian Guo, Virat Shejwalkar
+
+InitializationConstants:
+UpdateConstants:
+FinalizationConstants:
+
+InitializationCode: WordXorByte
+UpdateCode: WordXorByte, permute
+FinalizationCode: WordXorByte, permute, WordToByte
+
+UseFinalization: yes
+UseInitialization: yes
+
+ImplementationAVR: C
+ImplementationMSP: C
+ImplementationARM: C
+ImplementationPC: C
+ 

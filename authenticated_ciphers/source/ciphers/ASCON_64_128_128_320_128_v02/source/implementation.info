@@ -1,0 +1,10 @@
+ImplementationDescription: reference implementation of ASCON from SUPERCOP ImplementationAuthors: Virat Shejwalkar
+InitializationConstants:
+ProcessAssociatedDataConstants:
+ProcessPlaintextConstants:
+FinalizationConstants:
+TagGenerationConstants:
+ProcessCiphertextConstants:
+
+InitializationCode: permute ProcessAssociatedDataCode: permute ProcessPlaintextCode: permute FinalizationCode: permute TagGenerationCode:
+ProcessCiphertextCode: permute UseFinalization: yes ProcessEmptyAssociatedData: yes ProcessEmptyMessage: yes ImplementationPC: C ImplementationAVR: C ImplementationMSP: C ImplementationARM:C

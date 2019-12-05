@@ -1,0 +1,15 @@
+ImplementationDescription: reference implementation
+ImplementationAuthors: Johann Großschädl
+
+EncryptionKeyScheduleConstants:
+EncryptConstants: constants, constants1
+DecryptionKeyScheduleConstants:
+DecryptConstants: constants, constants2
+
+EncryptionKeyScheduleCode: 
+EncryptCode: 
+DecryptionKeyScheduleCode:
+DecryptCode:
+
+UseEncryptionKeySchedule: no
+UseDecryptionKeySchedule: no

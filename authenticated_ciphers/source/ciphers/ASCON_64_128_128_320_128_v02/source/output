@@ -1,0 +1,36 @@
+State:
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 Key:
+00 11 22 33 44 55 66 77 88 99 aa bb cc dd ee ff Expected Key:
+00 11 22 33 44 55 66 77 88 99 aa bb cc dd ee ff CORRECT ! Nonce:
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 Expected Nonce:
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 CORRECT ! Associated Data:
+ff ff ff ff ff ff ff ff Expected Associated Data:
+ff ff ff ff ff ff ff ff CORRECT ! Plaintext:
+01 23 45 67 89 ab cd ef Expected Plaintext:
+01 23 45 67 89 ab cd ef CORRECT !->Encryption initialization begin->Encryption initialization end Post_Initialization_State:
+f0 2 d aa b9 f5 09 89 43 81 30 08 06 b3 bd 0 d 43 6 a 38 03 d0 f5 b6 34 70 70 b4 51 bd 23 f3 bc b5 90 26 7 c 7e f b 41 58 62 Expected Post_Initialization_State:
+f0 2 d aa b9 f5 09 89 43 81 30 08 06 b3 bd 0 d 43 6 a 38 03 d0 f5 b6 34 70 70 b4 51 bd 23 f3 bc b5 90 26 7 c 7e f b 41 58 62 CORRECT !->Encryption associated data processing begin->Encryption associated data processing end Post_Associated_Data_Processing_State:
+33 93 ec 08 41 c6 97 a4 01 7f 1f ac a7 3 d 77 46 23 c0 ba 11 1f 42 b2 b1 5 c 2 b 3 a bc 39 49 69 66 a3 ff f0 80 95 a2 2f 1 d Expected Post_Associated_Data_Processing_State:
+33 93 ec 08 41 c6 97 a4 01 7f 1f ac a7 3 d 77 46 23 c0 ba 11 1f 42 b2 b1 5 c 2 b 3 a bc 39 49 69 66 a3 ff f0 80 95 a2 2f 1 d CORRECT !->Plaintext processing begin->Plaintext processing end Post_Plaintext_Processing_State:
+4f b1 66 1 a 67 55 58 b5 32 7 a e3 d6 f1 4 d cd e7 f1 7 a 66 0 b 0 d 2 c 6e 16 79 6 a c1 58 be 1 d 45 3 b 9 c 54 7 a bf 29 0 d 5 d 31 Expected Post_Plaintext_Processing_State:
+4f b1 66 1 a 67 55 58 b5 32 7 a e3 d6 f1 4 d cd e7 f1 7 a 66 0 b 0 d 2 c 6e 16 79 6 a c1 58 be 1 d 45 3 b 9 c 54 7 a bf 29 0 d 5 d 31 CORRECT ! Ciphertext:
+45 b3 ac d2 5 b b5 d7 e4 Expected Ciphertext:
+45 b3 ac d2 5 b b5 d7 e4 CORRECT !->Encryption finalization begin->Encryption finalization end Post_Finalization_State:
+cf 09 dc 23 c0 08 10 01 dc 95 94 22 4f a8 95 8 b b7 de b3 f4 3 d 0f 08 ec fe d6 98 dc 1e 22 29 87 80 e1 94 08 67 46 86 90 Expected Post_Finalization_State:
+cf 09 dc 23 c0 08 10 01 dc 95 94 22 4f a8 95 8 b b7 de b3 f4 3 d 0f 08 ec fe d6 98 dc 1e 22 29 87 80 e1 94 08 67 46 86 90 CORRECT !->Tag generation begin->Tag generation end Tag:
+e2 b5 86 c1 a6 2 c ab fc 41 80 c2 34 b8 16 94 15 Expected Tag:
+e2 b5 86 c1 a6 2 c ab fc 41 80 c2 34 b8 16 94 15 CORRECT !->Decryption initialization begin->Decryption initialization end Post_Initialization_State:
+f0 2 d aa b9 f5 09 89 43 81 30 08 06 b3 bd 0 d 43 6 a 38 03 d0 f5 b6 34 70 70 b4 51 bd 23 f3 bc b5 90 26 7 c 7e f b 41 58 62 Expected Post_Initialization_State:
+f0 2 d aa b9 f5 09 89 43 81 30 08 06 b3 bd 0 d 43 6 a 38 03 d0 f5 b6 34 70 70 b4 51 bd 23 f3 bc b5 90 26 7 c 7e f b 41 58 62 CORRECT !->Decryption associated data processing begin->Decryption associated data processing end Post_Associated_Data_Processing_State:
+33 93 ec 08 41 c6 97 a4 01 7f 1f ac a7 3 d 77 46 23 c0 ba 11 1f 42 b2 b1 5 c 2 b 3 a bc 39 49 69 66 a3 ff f0 80 95 a2 2f 1 d Expected Post_Associated_Data_Processing_State:
+33 93 ec 08 41 c6 97 a4 01 7f 1f ac a7 3 d 77 46 23 c0 ba 11 1f 42 b2 b1 5 c 2 b 3 a bc 39 49 69 66 a3 ff f0 80 95 a2 2f 1 d CORRECT !->Ciphertext processing begin->Ciphertext processing end Post_Ciphertext_Processing_State:
+4f b1 66 1 a 67 55 58 b5 32 7 a e3 d6 f1 4 d cd e7 f1 7 a 66 0 b 0 d 2 c 6e 16 79 6 a c1 58 be 1 d 45 3 b 9 c 54 7 a bf 29 0 d 5 d 31 Expected Post_Ciphertext_Processing_State:
+4f b1 66 1 a 67 55 58 b5 32 7 a e3 d6 f1 4 d cd e7 f1 7 a 66 0 b 0 d 2 c 6e 16 79 6 a c1 58 be 1 d 45 3 b 9 c 54 7 a bf 29 0 d 5 d 31 CORRECT ! Plaintext:
+01 23 45 67 89 ab cd ef Expected Plaintext:
+01 23 45 67 89 ab cd ef CORRECT !->Decryption finalization begin->Decryption finalization end Post_Finalization_State:
+cf 09 dc 23 c0 08 10 01 dc 95 94 22 4f a8 95 8 b b7 de b3 f4 3 d 0f 08 ec fe d6 98 dc 1e 22 29 87 80 e1 94 08 67 46 86 90 Expected Post_Finalization_State:
+cf 09 dc 23 c0 08 10 01 dc 95 94 22 4f a8 95 8 b b7 de b3 f4 3 d 0f 08 ec fe d6 98 dc 1e 22 29 87 80 e1 94 08 67 46 86 90 CORRECT !->Tag verification begin->Tag verification end Tag:
+e2 b5 86 c1 a6 2 c ab fc 41 80 c2 34 b8 16 94 15 Expected Tag:
+e2 b5 86 c1 a6 2 c ab fc 41 80 c2 34 b8 16 94 15 CORRECT ! Plaintext:
+01 23 45 67 89 ab cd ef Expected Plaintext:
+01 23 45 67 89 ab cd ef CORRECT !

@@ -1,0 +1,32 @@
+Scenarios
+=========
+Sc 0: verification of implementation's correctness using KATs
+Sc 1: Hash messages of length 16 bytes (1A), 128 bytes (1B), 1024 bytes (1C) bytes
+Sc 2: HMAC to generate 128 bits output; input key (k) 128 bits; input message = 'FELICS HMAC' 
+     - H(k XOR opad || H(k XOR ipad || m))
+     - If size(k) > BLOCK_SIZE then k = H(k)
+     - See RFC 2104
+
+
+CS
+==
+Sc 0: Initialize, Update, Finalize, Total code size
+Sc 1: Initialize, Update, Finalize, Total code size
+
+
+RAM
+===
+Sc 0: Initialize, Update, Finalize
+Sc 1: Stack(Initialize, Update, Finalize), Data(Initialize, Update, Finalize)
+
+
+ET
+==
+Sc 0: Initialize, Update, Finalize
+Sc 1: Initialize, Update, Finalize
+
+
+Constraints
+===========
+1. BLOCK_SIZE = 8k bits to easily accomodate Scenario 1
+2. DIGEST_SIZE <= 128 bits to allow use in Scenario 2
